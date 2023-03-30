@@ -23,9 +23,6 @@ class UR5():
             set = [p.getJointInfo(self.id, index)[0], p.getJointInfo(self.id, index)[1]]
             joint4InitPose.append(set)
 
-        target_v = 10                   # 电机达到的预定角速度（rad/s）
-        force = 10 
-
  
 
 
