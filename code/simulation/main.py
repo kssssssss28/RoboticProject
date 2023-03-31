@@ -12,10 +12,12 @@ from utils import initWorld,starSimulation, generateGarbage
 def main():
     GUI=True
     initWorld(GUI)
-    robot = UR5()
     con = CONVEYOR()
     box = generateGarbage()
+    robot = UR5()
     starSimulation()
+
+    
 
 if __name__ == '__main__':
     main()

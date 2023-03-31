@@ -37,6 +37,11 @@
     <limit effort="150.0" lower="-3.14159265359" upper="3.14159265359" velocity="3.15"/>
     <dynamics damping="0.0" friction="0.0"/>
   </joint>
+
+
+
+
+  
   <link name="shoulder_link">
     <visual>
       <geometry>
@@ -57,7 +62,7 @@
       <inertia ixx="0.010267495893" ixy="0.0" ixz="0.0" iyy="0.010267495893" iyz="0.0" izz="0.00666"/>
     </inertial>
   </link>
-  <joint name="shoulder_lift_joint" type="fixed">
+  <joint name="shoulder_lift_joint" type="revolute">
     <parent link="shoulder_link"/>
     <child link="upper_arm_link"/>
     <origin rpy="0.0 1.57079632679 0.0" xyz="0.0 0.13585 0.0"/>
@@ -113,7 +118,7 @@
       <inertia ixx="0.049443313556" ixy="0.0" ixz="0.0" iyy="0.049443313556" iyz="0.0" izz="0.004095"/>
     </inertial>
   </link>
-  <joint name="wrist_1_joint" type="fixed">
+  <joint name="wrist_1_joint" type="revolute">
     <parent link="forearm_link"/>
     <child link="wrist_1_link"/>
     <origin rpy="0.0 1.57079632679 0.0" xyz="0.0 0.0 0.39225"/>
@@ -141,7 +146,7 @@
       <inertia ixx="0.111172755531" ixy="0.0" ixz="0.0" iyy="0.111172755531" iyz="0.0" izz="0.21942"/>
     </inertial>
   </link>
-  <joint name="wrist_2_joint" type="fixed">
+  <joint name="wrist_2_joint" type="revolute">
     <parent link="wrist_1_link"/>
     <child link="wrist_2_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.093 0.0"/>
@@ -169,7 +174,7 @@
       <inertia ixx="0.111172755531" ixy="0.0" ixz="0.0" iyy="0.111172755531" iyz="0.0" izz="0.21942"/>
     </inertial>
   </link>
-  <joint name="wrist_3_joint" type="fixed">
+  <joint name="wrist_3_joint" type="revolute">
     <parent link="wrist_2_link"/>
     <child link="wrist_3_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.09465"/>
