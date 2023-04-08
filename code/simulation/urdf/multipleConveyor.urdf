@@ -1,0 +1,104 @@
+<?xml version="1.0" ?>
+<robot name="mbot">
+
+    <link name="base_link">
+        <visual>
+            <origin xyz="0 0 0.02" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.3 0.5 0.03"/>
+            </geometry>
+            <material name="yellow">
+                <color rgba="1 0.4 0 1"/>
+            </material>
+        </visual>
+
+        <collision>
+      <geometry>
+            <box size="0.3 0.5 0.03"/>
+            </geometry>
+    </collision>
+    
+  <inertial>
+    <mass value="10"/>
+    <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+  </inertial>
+
+    </link>
+
+    <joint name="left_wheel_joint" type="continuous">
+        <origin xyz="0 0.19 -0.05" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="left_wheel_link"/>
+        <axis xyz="0 1 0"/>
+    </joint>
+
+    <link name="left_wheel_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="1.5707 0 0" />
+            <geometry>
+                <cylinder radius="0.06" length = "0.025"/>
+            </geometry>
+            <material name="white">
+                <color rgba="1 1 1 0.9"/>
+            </material>
+        </visual>
+    </link>
+
+    <joint name="right_wheel_joint" type="continuous">
+        <origin xyz="0 -0.19 -0.05" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="right_wheel_link"/>
+        <axis xyz="0 1 0"/>
+    </joint>
+
+    <link name="right_wheel_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="1.5707 0 0" />
+            <geometry>
+                <cylinder radius="0.06" length = "0.025"/>
+            </geometry>
+            <material name="black">
+                <color rgba="0 0 0 0.9"/>
+            </material>
+        </visual>
+    </link>
+
+    <joint name="front_caster_joint" type="continuous">
+        <origin xyz="0.18 0 -0.095" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="front_caster_link"/>
+        <axis xyz="0 1 0"/>
+    </joint>
+
+    <link name="front_caster_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.015" />
+            </geometry>
+            <material name="red">
+                <color rgba="1 0 0 0.95"/>
+            </material>
+        </visual>
+    </link>
+
+    <joint name="back_caster_joint" type="continuous">
+        <origin xyz="-0.18 0 -0.095" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="back_caster_link"/>
+        <axis xyz="0 1 0"/>
+    </joint>
+
+    <link name="back_caster_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.015" />
+            </geometry>
+            <material name="green">
+                <color rgba="0 1 0 0.95"/>
+            </material>
+        </visual>
+    </link>
+
+</robot>

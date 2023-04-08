@@ -1,20 +1,21 @@
 <?xml version="1.0"?>
-<robot name="cube">
+<robot name="pan">
   <material name="red">
-    <color rgba="1 0 0 1"/>
+    <color rgba="0 0 1.0 1"/>
   </material>
 
   <link name="right_leg">
     <visual>
         <material name="red"/>
+      <origin xyz="0 0 0" rpy="0 0 1"/>
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <cylinder radius='2' length='0.03' />
       </geometry>
     </visual>
 
     <collision>
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <cylinder radius='2' length='0.03' />
       </geometry>
     </collision>
 

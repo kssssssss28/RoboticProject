@@ -1,0 +1,356 @@
+[
+    {
+        "num_obj": 27
+    },
+    {
+        "image": "cropped_result\\1287_Otherplasticwrapper_Plasticbag&wrapper_mask_0.jpg",
+        "bbox": [
+            1172,
+            4268,
+            1387,
+            4436
+        ],
+        "subcategory": "Otherplasticwrapper",
+        "category": "Plasticbag&wrapper",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\16_Aerosol_Can_mask_1.jpg",
+        "bbox": [
+            3908,
+            3794,
+            4173,
+            4275
+        ],
+        "subcategory": "Aerosol",
+        "category": "Can",
+        "obj_id": "1",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\271_Clearplasticbottle_Bottle_mask_0.jpg",
+        "bbox": [
+            3677,
+            3045,
+            4826,
+            3398
+        ],
+        "subcategory": "Clearplasticbottle",
+        "category": "Bottle",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\499_Disposablefoodcontainer_Plasticcontainer_mask_0.jpg",
+        "bbox": [
+            101,
+            16,
+            2117,
+            2001
+        ],
+        "subcategory": "Disposablefoodcontainer",
+        "category": "Plasticcontainer",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\1005_Otherplastic_Otherplastic_mask_1.jpg",
+        "bbox": [
+            4039,
+            2002,
+            4836,
+            2073
+        ],
+        "subcategory": "Otherplastic",
+        "category": "Otherplastic",
+        "obj_id": "1",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\60_Clearplasticbottle_Bottle_mask_0.jpg",
+        "bbox": [
+            246,
+            2995,
+            690,
+            3279
+        ],
+        "subcategory": "Clearplasticbottle",
+        "category": "Bottle",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\1339_Glassbottle_Bottle_mask_0.jpg",
+        "bbox": [
+            3202,
+            4105,
+            3700,
+            4312
+        ],
+        "subcategory": "Glassbottle",
+        "category": "Bottle",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\780_Drinkcan_Can_mask_0.jpg",
+        "bbox": [
+            3546,
+            1107,
+            3802,
+            1581
+        ],
+        "subcategory": "Drinkcan",
+        "category": "Can",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\1244_Plasticfilm_Plasticbag&wrapper_mask_0.jpg",
+        "bbox": [
+            803,
+            4565,
+            1032,
+            4794
+        ],
+        "subcategory": "Plasticfilm",
+        "category": "Plasticbag&wrapper",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\1488_Corrugatedcarton_Carton_mask_0.jpg",
+        "bbox": [
+            1683,
+            4152,
+            2084,
+            4837
+        ],
+        "subcategory": "Corrugatedcarton",
+        "category": "Carton",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\442_Plasticstraw_Straw_mask_1.jpg",
+        "bbox": [
+            316,
+            3932,
+            462,
+            4249
+        ],
+        "subcategory": "Plasticstraw",
+        "category": "Straw",
+        "obj_id": "1",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\549_Clearplasticbottle_Bottle_mask_1.jpg",
+        "bbox": [
+            3864,
+            4417,
+            4163,
+            4644
+        ],
+        "subcategory": "Clearplasticbottle",
+        "category": "Bottle",
+        "obj_id": "1",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\416_Plasticstraw_Straw_mask_2.jpg",
+        "bbox": [
+            4808,
+            1747,
+            4863,
+            1792
+        ],
+        "subcategory": "Plasticstraw",
+        "category": "Straw",
+        "obj_id": "2",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\523_Paperbag_Paperbag_mask_2.jpg",
+        "bbox": [
+            3870,
+            1500,
+            4473,
+            1938
+        ],
+        "subcategory": "Paperbag",
+        "category": "Paperbag",
+        "obj_id": "2",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\233_Plasticfilm_Plasticbag&wrapper_mask_0.jpg",
+        "bbox": [
+            1916,
+            3462,
+            2154,
+            3814
+        ],
+        "subcategory": "Plasticfilm",
+        "category": "Plasticbag&wrapper",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\715_Drinkcan_Can_mask_4.jpg",
+        "bbox": [
+            2814,
+            212,
+            3082,
+            565
+        ],
+        "subcategory": "Drinkcan",
+        "category": "Can",
+        "obj_id": "2",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\873_Othercarton_Carton_mask_3.jpg",
+        "bbox": [
+            2549,
+            1996,
+            3645,
+            3390
+        ],
+        "subcategory": "Othercarton",
+        "category": "Carton",
+        "obj_id": "2",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\54_Crisppacket_Plasticbag&wrapper_mask_1.jpg",
+        "bbox": [
+            1784,
+            2685,
+            2191,
+            3200
+        ],
+        "subcategory": "Crisppacket",
+        "category": "Plasticbag&wrapper",
+        "obj_id": "1",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\1096_Clearplasticbottle_Bottle_mask_0.jpg",
+        "bbox": [
+            3838,
+            486,
+            4385,
+            1016
+        ],
+        "subcategory": "Clearplasticbottle",
+        "category": "Bottle",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\1401_Cigarette_Cigarette_mask_0.jpg",
+        "bbox": [
+            4721,
+            1057,
+            4821,
+            1169
+        ],
+        "subcategory": "Cigarette",
+        "category": "Cigarette",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\245_Garbagebag_Plasticbag&wrapper_mask_0.jpg",
+        "bbox": [
+            2718,
+            1361,
+            3407,
+            1668
+        ],
+        "subcategory": "Garbagebag",
+        "category": "Plasticbag&wrapper",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\894_Otherplastic_Otherplastic_mask_0.jpg",
+        "bbox": [
+            4402,
+            3509,
+            4850,
+            3847
+        ],
+        "subcategory": "Otherplastic",
+        "category": "Otherplastic",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\329_Unlabeledlitter_Unlabeledlitter_mask_2.jpg",
+        "bbox": [
+            2597,
+            4256,
+            2890,
+            4572
+        ],
+        "subcategory": "Unlabeledlitter",
+        "category": "Unlabeledlitter",
+        "obj_id": "2",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\558_Plasticfilm_Plasticbag&wrapper_mask_0.jpg",
+        "bbox": [
+            3370,
+            135,
+            4437,
+            427
+        ],
+        "subcategory": "Plasticfilm",
+        "category": "Plasticbag&wrapper",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\387_Mealcarton_Carton_mask_2.jpg",
+        "bbox": [
+            754,
+            2562,
+            1743,
+            3022
+        ],
+        "subcategory": "Mealcarton",
+        "category": "Carton",
+        "obj_id": "2",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\1219_Plasticfilm_Plasticbag&wrapper_mask_0.jpg",
+        "bbox": [
+            2920,
+            888,
+            3128,
+            987
+        ],
+        "subcategory": "Plasticfilm",
+        "category": "Plasticbag&wrapper",
+        "obj_id": "0",
+        "score": 1.0
+    },
+    {
+        "image": "cropped_result\\554_Otherplastic_Otherplastic_mask_0.jpg",
+        "bbox": [
+            558,
+            3686,
+            1749,
+            4148
+        ],
+        "subcategory": "Otherplastic",
+        "category": "Otherplastic",
+        "obj_id": "0",
+        "score": 1.0
+    }
+]

@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <robot name="cube">
-  <material name="red">
-    <color rgba="1 0 0 1"/>
+  <material name="green">
+    <color rgba="0 1.0 0 1"/>
   </material>
 
   <link name="right_leg">
     <visual>
-        <material name="red"/>
+        <material name="green"/>
       <geometry>
         <box size="0.1 0.1 0.1"/>
       </geometry>
