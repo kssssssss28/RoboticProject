@@ -15,15 +15,20 @@ def main():
     initWorld(GUI,[1, .5, 0], 4)
 
     number = 4
-    # robots = UR5(number)
+    robots = UR5(number)
 
-    # for index in range(number):
-    #      #### 机器人的id是从1 开始的
-    #      robots.moveArm(robots.robots[index]["id"],[1,index - 1,1],[0,0,1])
-
-    con = CONVEYOR()
-    #         垃圾的数量 是不是要拍照 产生垃圾的间隔&拍照间隔
-    starSimulation(5,True, 4000)
+    for index in range(number):
+          #### 机器人的id是从1 开始的
+          robots.moveArm(robots.robots[index]["id"],[1,index - 1,1],[0,0,1])
+   
+   
+    #           传送带速度
+    con = CONVEYOR(1)
+   
+   
+   
+    #         垃圾的数量 是不是要拍照(path = simulation/data/img.png) 产生垃圾的间隔&拍照间隔
+    starSimulation(20,True, 4000)
 
 
 

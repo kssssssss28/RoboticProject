@@ -148,26 +148,15 @@ class UR5():
 
 
 class CONVEYOR():
-    def __init__(self):
-        #conveyor_belt = p.loadURDF("code/simulation/urdf/block.urdf",[0.6,-1,0])
-        #print(p.getNumJoints(conveyor_belt))
-        # 加载urdf文件
+    def __init__(self,speed):
 
-                # 创建传送带
+        # 创建传送带
         conveyor_pos = [0.56, 0, 0.1]
         conveyor_ori = p.getQuaternionFromEuler([0, 0, 0])
         conveyor_id = p.loadURDF("../simulation/urdf/block.urdf", conveyor_pos, conveyor_ori)
         
-        # 设置传送带速度
-        joint_poses = p.calculateInverseKinematics(conveyor_id ,
-                                           0,
-                                           [0,100,0],
-                                           targetOrientation=[],
-                                           )
 
-        #p.setJointMotorControl2(conveyor_id , 0,p.POSITION_CONTROL,joint_poses[0],force=100)
-        # p.setJointMotorControl2(conveyor_id , 0,p.POSITION_CONTROL,joint_poses[0],force=100)
-        # 设置传送带速度
-        conveyor_speed = 1.0  # 传送带速度，单位为m/s
+       # 设置传送带速度
+        conveyor_speed = speed  # 传送带速度，单位为m/s
         conveyor_joint_index = 0  # 传送带关节的索引
         p.setJointMotorControl2(conveyor_id, conveyor_joint_index, p.VELOCITY_CONTROL, targetVelocity=conveyor_speed)

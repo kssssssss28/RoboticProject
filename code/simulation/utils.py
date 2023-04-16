@@ -14,8 +14,8 @@ def saveImg():
     img_arr = p.getCameraImage(width=480, height=320)
     rgb_arr = np.array(img_arr[2])[:,:,[2,1,0]] # BGR to RGB
     img = Image.fromarray(rgb_arr)
-    # 保存图像
-    img.save("image.png")
+    # 保存图像 
+    img.save("../simulation/data/image.png")
 
 def initWorld(GUI, cameraPos = [1, .5, 0], dis = 4):
     physicsClient = p.connect(p.GUI if GUI else p.DIRECT)
@@ -32,8 +32,8 @@ def initWorld(GUI, cameraPos = [1, .5, 0], dis = 4):
 
 
     # 在 (0,0,0.5) 处画 x，y，z 坐标轴
-    p.addUserDebugLine([0, 0, 0], [5, 0, 0.5], x_color, 5, 20000)
-    p.addUserDebugLine([0, 0, 0], [0, 5, .5], y_color, 5, 20000)
+    p.addUserDebugLine([0, 0, 2], [5, 0, 2], x_color, 5, 20000)
+    p.addUserDebugLine([0, 0, 2], [0, 5, 2], y_color, 5, 20000)
     p.addUserDebugLine([0, 0, 0], [0, 0, 10], z_color, 5, 20000)
 
 
@@ -69,6 +69,8 @@ def starSimulation(totalGarbage, takeImg, delay = 4000):
         if count >= delay + 200:
             if takeImg:
                 saveImg()
+
+
 
         p.stepSimulation() 
         count = count + rd
