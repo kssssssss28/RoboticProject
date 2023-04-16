@@ -6,18 +6,18 @@ import pybullet as p
 import numpy as np
 from PIL import Image
 import random
+
 def saveImg():
         # 将图像数据转换为 RGB 图像
 
         # 获取相机图像
     img_arr = p.getCameraImage(width=480, height=320)
-
     rgb_arr = np.array(img_arr[2])[:,:,[2,1,0]] # BGR to RGB
     img = Image.fromarray(rgb_arr)
     # 保存图像
     img.save("image.png")
 
-def initWorld(GUI):
+def initWorld(GUI, cameraPos = [1, .5, 0], dis = 4):
     physicsClient = p.connect(p.GUI if GUI else p.DIRECT)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     p.setGravity(0, 0, -9.81)
@@ -32,37 +32,43 @@ def initWorld(GUI):
 
 
     # 在 (0,0,0.5) 处画 x，y，z 坐标轴
-    p.addUserDebugLine([0, 0, 3], [5, 0, 3], x_color, 5, 20000)
-    p.addUserDebugLine([0, 0, 3], [0, 5, 3], y_color, 5, 20000)
+    p.addUserDebugLine([0, 0, 0], [5, 0, 0.5], x_color, 5, 20000)
+    p.addUserDebugLine([0, 0, 0], [0, 5, .5], y_color, 5, 20000)
     p.addUserDebugLine([0, 0, 0], [0, 0, 10], z_color, 5, 20000)
 
 
 
     # 设置相机位置和方向
     p.resetDebugVisualizerCamera(
-        cameraDistance=4,
+        cameraDistance=dis,
         cameraYaw=0,
         cameraPitch=269,
-        cameraTargetPosition=[1.2, -.7, 0]
+        cameraTargetPosition=cameraPos
     )
 
 
-
-
-    
-
-def starSimulation():
+def starSimulation(totalGarbage, takeImg, delay = 4000):
 
     box = GARBAGE(20)
     count = 3500
+    total = 0
     while (True): 
-        print(count)
-        rd = random.randint(0, 100)
 
-        if count >= 7000:
+        rd = random.randint(0, 50)
+
+
+        if count >= delay: 
             count = 0
-            box.generateGarbage()
-            saveImg()
+            total = total + 1
+            if total < totalGarbage + 1:
+                box.generateGarbage()
+                if takeImg:
+                    saveImg()
+
+
+        if count >= delay + 200:
+            if takeImg:
+                saveImg()
 
         p.stepSimulation() 
         count = count + rd

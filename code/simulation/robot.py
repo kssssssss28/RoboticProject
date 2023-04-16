@@ -30,7 +30,7 @@ class GARBAGE():
     def __init__(self, number):
         garbageMap = ["red","blue","green"]
         #generate init box
-        with open('code/simulation/data/data.json', 'r') as fcc_file:
+        with open('../simulation/data/data.json', 'r') as fcc_file:
              garbageInfo = list(json.load(fcc_file))
         garbageInfo.pop(0)
         self.garbageData = []
@@ -39,7 +39,7 @@ class GARBAGE():
         for i in garbageInfo:  
             type = garbageMap[int(i["obj_id"])]
             r = random.uniform(0, radius)
-            path = "code/simulation/urdf/" + str(type) + "box.urdf"
+            path = "../simulation/urdf/" + str(type) + "Box.urdf"
             boxInfo = dict()
             boxInfo["name"]= str(type) + "Box"
             boxInfo["path"]= path
@@ -52,7 +52,9 @@ class GARBAGE():
         rd = random.randint(0, self.number)
         garbage = self.garbageData[rd]
         path = garbage["path"]
-        rdPosition = [random.uniform(0.2, 0.4),-3,.52]
+        threePath = [0.3, 0.55, 0.8]
+        rdPath = random.randint(0,2)
+        rdPosition = [threePath[rdPath],-3,.4]
         garbage["startPos"] =rdPosition
         startPos = garbage["startPos"]
         startOri = garbage["startOri"]
@@ -71,10 +73,17 @@ class UR5():
     def __init__(self, number):
         self.robots= list()
         for robot in range(number):
-            startPos = [0,robot-0.8,0.47]
+            if robot % 2 == 0:
+                startPos = [0,robot-0.8,0.47]
+                startOrientation = p.getQuaternionFromEuler([0, 0, 0]) # Rotate 180 degrees around z-axis
+            else:
+                startPos = [1.2,robot-0.8,0.47]
+                startOrientation = p.getQuaternionFromEuler([0, 0, 3.15])
 
-            startOrientation = p.getQuaternionFromEuler([0, 0, 0])
-            robot_id = p.loadURDF('code/simulation/urdf/ur5_robotiq_85.urdf', startPos, startOrientation)
+
+
+            #startOrientation = p.getQuaternionFromEuler([0, 0, 0])
+            robot_id = p.loadURDF('../urdf/ur5_robotiq_85.urdf', startPos, startOrientation)
             availableJoints = [i for i in range(p.getNumJoints(robot_id)) if p.getJointInfo(robot_id, i)[2] != p.JOINT_FIXED]
 
 
@@ -147,13 +156,18 @@ class CONVEYOR():
                 # 创建传送带
         conveyor_pos = [0.56, 0, 0.1]
         conveyor_ori = p.getQuaternionFromEuler([0, 0, 0])
-        conveyor_id = p.loadURDF("code/simulation/urdf/block.urdf", conveyor_pos, conveyor_ori)
+        conveyor_id = p.loadURDF("../simulation/urdf/block.urdf", conveyor_pos, conveyor_ori)
         
         # 设置传送带速度
         joint_poses = p.calculateInverseKinematics(conveyor_id ,
                                            0,
-                                           [0,200,0],
+                                           [0,100,0],
                                            targetOrientation=[],
                                            )
 
-        p.setJointMotorControl2(conveyor_id , 0,p.POSITION_CONTROL,joint_poses[0],force=105)
+        #p.setJointMotorControl2(conveyor_id , 0,p.POSITION_CONTROL,joint_poses[0],force=100)
+        # p.setJointMotorControl2(conveyor_id , 0,p.POSITION_CONTROL,joint_poses[0],force=100)
+        # 设置传送带速度
+        conveyor_speed = 1.0  # 传送带速度，单位为m/s
+        conveyor_joint_index = 0  # 传送带关节的索引
+        p.setJointMotorControl2(conveyor_id, conveyor_joint_index, p.VELOCITY_CONTROL, targetVelocity=conveyor_speed)
