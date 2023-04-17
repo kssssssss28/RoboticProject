@@ -1,13 +1,10 @@
 
-import os
-import time
 import pybullet as p
-import math
-from collections import namedtuple
 import json
 import random
-import math
 import numpy as np
+
+
 # 圆心坐标
 center = (1, -1)
 # 圆半径
@@ -21,7 +18,7 @@ radius = 1.5
 # [6, b'wrist_3_joint'], 
 # [9, b'finger_joint'], 
 # [11, b'left_inner_finger_joint'], 
-# [13, b'left_inner_knuckle_joint'], 
+# [13, b'left_inner_knuckle_joint'],  
 # [14, b'right_outer_knuckle_joint'], 
 # [16, b'right_inner_finger_joint'], 
 # [18, b'right_inner_knuckle_joint']]
@@ -29,13 +26,16 @@ class GARBAGE():
 
     def __init__(self, number):
         garbageMap = ["red","blue","green"]
-        #generate init box
+        self.threePath = [0.3, 0.55, 0.8]
+        
         with open('../simulation/data/data.json', 'r') as fcc_file:
              garbageInfo = list(json.load(fcc_file))
+
         garbageInfo.pop(0)
         self.garbageData = []
         startOrientation = p.getQuaternionFromEuler([0, 0, 0])
         self.number = number
+
         for i in garbageInfo:  
             type = garbageMap[int(i["obj_id"])]
             r = random.uniform(0, radius)
@@ -43,30 +43,50 @@ class GARBAGE():
             boxInfo = dict()
             boxInfo["name"]= str(type) + "Box"
             boxInfo["path"]= path
+            boxInfo["type"]= self.color2int(str(type))
             boxInfo["startOri"] = startOrientation
             boxInfo["startPos"] = [0, 0,  0.52]
+            boxInfo["boxId"] = None
             self.garbageData.append(boxInfo)
+
         self.garbageData = list(self.garbageData)
 
     def generateGarbage(self):
         rd = random.randint(0, self.number)
         garbage = self.garbageData[rd]
         path = garbage["path"]
-        threePath = [0.3, 0.55, 0.8]
         rdPath = random.randint(0,2)
-        rdPosition = [threePath[rdPath],-3,.4]
-        garbage["startPos"] =rdPosition
+        rdPosition = [self.threePath[rdPath],-3,.4]
+        garbage["startPos"] = rdPosition
         startPos = garbage["startPos"]
         startOri = garbage["startOri"]
         boxId = p.loadURDF(path, startPos, startOri)
         p.changeDynamics(boxId,-1,mass = 5)
         self.garbageData[rd]["boxId"] = boxId
+        # print('---'*10)
+        # print('The type of garbage is: ', self.garbageData[rd]["type"])
+        # print('---'*10)
+    
+    def color2int(self, type):
+        if type == 'red':
+            return 0
+        elif type == 'blue':
+            return 1
+        else:
+            return 2
 
+
+class CONVEYOR():
+    def __init__(self,speed):
+
+        conveyor_pos = [0.56, 0, 0.1]
+        conveyor_ori = p.getQuaternionFromEuler([0, 0, 0])
+        conveyor_id = p.loadURDF("../simulation/urdf/block.urdf", conveyor_pos, conveyor_ori)
         
 
-
-
-
+        conveyor_speed = speed  # m/s
+        conveyor_joint_index = 0 
+        p.setJointMotorControl2(conveyor_id, conveyor_joint_index, p.VELOCITY_CONTROL, targetVelocity=conveyor_speed)
 
 
 class UR5():
@@ -80,9 +100,6 @@ class UR5():
                 startPos = [1.2,robot-0.8,0.47]
                 startOrientation = p.getQuaternionFromEuler([0, 0, 3.15])
 
-
-
-            #startOrientation = p.getQuaternionFromEuler([0, 0, 0])
             robot_id = p.loadURDF('../urdf/ur5_robotiq_85.urdf', startPos, startOrientation)
             availableJoints = [i for i in range(p.getNumJoints(robot_id)) if p.getJointInfo(robot_id, i)[2] != p.JOINT_FIXED]
 
@@ -95,9 +112,8 @@ class UR5():
             robot["joints"] = []
             robot["movableJoints"] = []
             for i in range(numJoints):
-            #得到节点的信息
+                
                 info = p.getJointInfo(robot_id,i)
-                #将节点的各个信息提取出来
                 item = dict()
                 item["jointID"] = info[0]
                 item['jointName'] = info[1].decode('utf-8')
@@ -113,13 +129,7 @@ class UR5():
 
             self.robots.append(robot)
 
-
-
-
-
     def moveArm(self, id, pos, ori):
-        #### 机器人的id是从1 开始的
-        ### id = 1 应该对应robots数组的第一个机器人
         robot = self.robots[id - 1]
         joint_poses = p.calculateInverseKinematics(id,
                                            18,
@@ -143,20 +153,3 @@ class UR5():
     def openGripper(self,index):
         p.setJointMotorControl2(index,11,p.VELOCITY_CONTROL,30,-50)
         p.setJointMotorControl2(index,16,p.VELOCITY_CONTROL,30,-50)
-            
-
-
-
-class CONVEYOR():
-    def __init__(self,speed):
-
-        # 创建传送带
-        conveyor_pos = [0.56, 0, 0.1]
-        conveyor_ori = p.getQuaternionFromEuler([0, 0, 0])
-        conveyor_id = p.loadURDF("../simulation/urdf/block.urdf", conveyor_pos, conveyor_ori)
-        
-
-       # 设置传送带速度
-        conveyor_speed = speed  # 传送带速度，单位为m/s
-        conveyor_joint_index = 0  # 传送带关节的索引
-        p.setJointMotorControl2(conveyor_id, conveyor_joint_index, p.VELOCITY_CONTROL, targetVelocity=conveyor_speed)

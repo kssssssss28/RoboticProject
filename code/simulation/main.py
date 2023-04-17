@@ -7,7 +7,7 @@ import math
 import pybullet as p
 from robot import UR5, CONVEYOR, GARBAGE
 from utils import initWorld,starSimulation
-
+import random
 
 def main():
     GUI=True
@@ -19,7 +19,7 @@ def main():
 
     for index in range(number):
           #### 机器人的id是从1 开始的
-          robots.moveArm(robots.robots[index]["id"],[1,index - 1,1],[0,0,1])
+          robots.moveArm(robots.robots[index]["id"],[random.random(),index - 1,random.random()],[0,0,1])
    
    
     #           传送带速度
@@ -28,9 +28,10 @@ def main():
    
    
     #         垃圾的数量 是不是要拍照(path = simulation/data/img.png) 产生垃圾的间隔&拍照间隔
-    starSimulation(20,True, 4000)
+    starSimulation(20, True, 4000)
 
 
 
 if __name__ == '__main__':
     main()
+ 
