@@ -10,7 +10,7 @@ def main():
     # Create the environment
     env = GarbageSortingEnv()
     env = DummyVecEnv([lambda: env])
-    model_name = 'ppo_conveyor_moving'
+    model_name = 'ppo_0.15m'
     model = PPO.load(model_name)
 
     # Evaluate the trained model
