@@ -13,8 +13,8 @@ class GARBAGE():
     def __init__(self, number):
         garbageMap = ["red","blue","green"]
         self.threePath = [0.3, 0.55, 0.8]
-        
-        with open('../simulation/data/data.json', 'r') as fcc_file:
+        print(os.getcwd())
+        with open('code/simulation/data/data.json', 'r') as fcc_file:
              garbageInfo = list(json.load(fcc_file))
 
         garbageInfo.pop(0)
@@ -25,7 +25,7 @@ class GARBAGE():
         for i in garbageInfo:  
             type = garbageMap[int(i["obj_id"])]
             # r = random.uniform(0, radius)
-            path = "../simulation/urdf/" + str(type) + "Box.urdf"
+            path = "code/simulation/urdf/" + str(type) + "Box.urdf"
             boxInfo = dict()
             boxInfo["name"]= str(type) + "Box"
             boxInfo["path"]= path
@@ -127,14 +127,14 @@ class GarbageSortingEnv(gym.Env):
 
 
         # ------------------------- initialize robotic arm ------------------------------
-        self.robot_arm_ids = p.loadURDF('../urdf/ur5_robotiq_85.urdf', [0 - self.move_right,-0.8,0.47], p.getQuaternionFromEuler([0, 0, 0]))
+        self.robot_arm_ids = p.loadURDF('code/simulation/urdf/ur5_robotiq_85.urdf', [0 - self.move_right,-0.8,0.47], p.getQuaternionFromEuler([0, 0, 0]))
         # ------------------------- robotic arm ------------------------------
    
 
         # ------------------------- initialize conveyor belt ------------------------------
         conveyor_pos = [0.56, 0, 0.1]
         conveyor_ori = p.getQuaternionFromEuler([0, 0, 0])
-        self.conveyor_id = p.loadURDF("../simulation/urdf/block.urdf", conveyor_pos, conveyor_ori)
+        self.conveyor_id = p.loadURDF("code/simulation/urdf/block.urdf", conveyor_pos, conveyor_ori)
         conveyor_speed = self.conveyor_speed   
         conveyor_joint_index = 0 
         p.setJointMotorControl2(self.conveyor_id, conveyor_joint_index, p.VELOCITY_CONTROL, targetVelocity=conveyor_speed)
