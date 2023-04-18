@@ -10,13 +10,13 @@ def main():
     # Create the environment
     env = GarbageSortingEnv()
     env = DummyVecEnv([lambda: env])
-    model_name = 'ppo_conveyor_moving'
-    
+    model_name = 'ppo_0.15m'
+
     # Instantiate the PPO agent
     model = PPO("MlpPolicy", env, verbose=1, tensorboard_log="./ppo_garbage_sorting_tensorboard/")
 
     # Train the agent
-    training_timesteps = 100000
+    training_timesteps = 150000
     model.learn(total_timesteps=int(training_timesteps))
 
     # Save the trained model
