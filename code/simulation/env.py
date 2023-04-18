@@ -13,8 +13,7 @@ class GARBAGE():
     def __init__(self, number):
         garbageMap = ["red","blue","green"]
         self.threePath = [0.3, 0.55, 0.8]
-        print(os.getcwd())
-        with open('code/simulation/data/data.json', 'r') as fcc_file:
+        with open('../simulation/data/data.json', 'r') as fcc_file:
              garbageInfo = list(json.load(fcc_file))
 
         garbageInfo.pop(0)
@@ -25,7 +24,7 @@ class GARBAGE():
         for i in garbageInfo:  
             type = garbageMap[int(i["obj_id"])]
             # r = random.uniform(0, radius)
-            path = "code/simulation/urdf/" + str(type) + "Box.urdf"
+            path = "../simulation/urdf/" + str(type) + "Box.urdf"
             boxInfo = dict()
             boxInfo["name"]= str(type) + "Box"
             boxInfo["path"]= path
@@ -112,7 +111,7 @@ class GarbageSortingEnv(gym.Env):
     def load_models(self):
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.setGravity(0, 0, -9.81)
-        p.loadURDF("plane.urdf")
+        ground_id = p.loadURDF(pybullet_data.getDataPath() + "/plane.urdf")
 
         x_color = [1, 0, 0]  
         y_color = [0, 1, 0]  
@@ -127,19 +126,19 @@ class GarbageSortingEnv(gym.Env):
 
 
         # ------------------------- initialize robotic arm ------------------------------
-        self.robot_arm_ids = p.loadURDF('code/simulation/urdf/ur5_robotiq_85.urdf', [0 - self.move_right,-0.8,0.47], p.getQuaternionFromEuler([0, 0, 0]))
+        self.robot_arm_ids = p.loadURDF('../simulation/urdf/ur5_robotiq_85.urdf', [0 - self.move_right,-0.8,0.47], p.getQuaternionFromEuler([0, 0, 0]))
         # ------------------------- robotic arm ------------------------------
    
 
         # ------------------------- initialize conveyor belt ------------------------------
         conveyor_pos = [0.56, 0, 0.1]
         conveyor_ori = p.getQuaternionFromEuler([0, 0, 0])
-        self.conveyor_id = p.loadURDF("code/simulation/urdf/block.urdf", conveyor_pos, conveyor_ori)
+        self.conveyor_id = p.loadURDF("../simulation/urdf/block.urdf", conveyor_pos, conveyor_ori)
         conveyor_speed = self.conveyor_speed   
         conveyor_joint_index = 0 
         p.setJointMotorControl2(self.conveyor_id, conveyor_joint_index, p.VELOCITY_CONTROL, targetVelocity=conveyor_speed)
         # ------------------------- conveyor belt ------------------------------
-
+        constraint_id = p.createConstraint(ground_id, -1, self.conveyor_id, -1, p.JOINT_FIXED, [0, 0, 0], [0.56, 0, 0.1], [0, 0, 0])
 
     def step(self, action):
         
@@ -255,7 +254,7 @@ class GarbageSortingEnv(gym.Env):
 
         if debug:
             print('-'*30)
-            print('garbage position and oritation is:')
+            print('garbage position and orientation is:')
             print(garbage_positions_orientations)
             print('garbage position is:')
             print(garbage_positions)
