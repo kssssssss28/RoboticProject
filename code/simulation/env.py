@@ -81,6 +81,7 @@ class GarbageSortingEnv(gym.Env):
         self.move_right = 0.2  
         self.steps = 0
         self.total_steps = 1500
+        
 
         self.garbage = GARBAGE(self.num_garbage)
         # self.reset()
@@ -104,14 +105,14 @@ class GarbageSortingEnv(gym.Env):
             cameraPitch=269,
             cameraTargetPosition=self.camera_pos
         )
-
+        self.ground_id = p.loadURDF(pybullet_data.getDataPath() + "/plane.urdf")
         # Load the environment models
         self.load_models()
 
     def load_models(self):
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.setGravity(0, 0, -9.81)
-        ground_id = p.loadURDF(pybullet_data.getDataPath() + "/plane.urdf")
+        
 
         x_color = [1, 0, 0]  
         y_color = [0, 1, 0]  
@@ -138,7 +139,7 @@ class GarbageSortingEnv(gym.Env):
         conveyor_joint_index = 0 
         p.setJointMotorControl2(self.conveyor_id, conveyor_joint_index, p.VELOCITY_CONTROL, targetVelocity=conveyor_speed)
         # ------------------------- conveyor belt ------------------------------
-        constraint_id = p.createConstraint(ground_id, -1, self.conveyor_id, -1, p.JOINT_FIXED, [0, 0, 0], [0.56, 0, 0.1], [0, 0, 0])
+        p.createConstraint(self.ground_id, -1, self.conveyor_id, -1, p.JOINT_FIXED, [0, 0, 0], [0.56, 0, 0.1], [0, 0, 0])
 
     def step(self, action):
         
@@ -215,6 +216,8 @@ class GarbageSortingEnv(gym.Env):
         conveyor_joint_index = 0
         conveyor_speed = self.conveyor_speed
         p.resetJointState(self.conveyor_id, conveyor_joint_index, p.VELOCITY_CONTROL,targetVelocity=conveyor_speed)
+        p.createConstraint(self.ground_id, -1, self.conveyor_id, -1, p.JOINT_FIXED, [0, 0, 0], [0.56, 0, 0.1], [0, 0, 0])
+
 
         # Get observation
         observation = self.get_observation()

@@ -27,7 +27,7 @@ def main():
         episode_reward = 0
 
         for step in range(max_steps_per_episode):
-            action = env.action_space.sample()  # Sample random action for the robotic arm
+            action = env.action_space.sample()  
             obs, reward, done, _ = env.step(action)
 
             if debug: 
@@ -44,7 +44,7 @@ def main():
 
             time.sleep(1./100.)
 
-        # print(f"Episode reward: {episode_reward}")
+
         
         saveImg()
 
