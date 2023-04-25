@@ -13,7 +13,8 @@ class GARBAGE():
 
     def __init__(self, number):
         garbageMap = ["red","blue","green"]
-        self.threePath = [0.3, 0.55, 0.8]
+        self.threePath = [0.8, 0.8, 0.8]
+        #elf.threePath = [0.3, 0.55, 0.8]
         with open('../simulation/data/data.json', 'r') as fcc_file:
              garbageInfo = list(json.load(fcc_file))
 
@@ -88,7 +89,7 @@ class GarbageSortingEnv(gym.Env):
         # self.reset()
         
         # Define action and observation spaces
-        self.action_space = spaces.Box(low=-10, high=11, shape=(3,), dtype=np.float32)
+        self.action_space = spaces.Box(low=.3, high=1.2, shape=(3,), dtype=np.float32)
         # robot,           gripper position garbage pos gripper status distance(g and d) distance(g and g) 
         observation_space_shape =  8
         
@@ -162,16 +163,20 @@ class GarbageSortingEnv(gym.Env):
         
         effector_position = [observation[3], observation[4], observation[5]]
         garbage_positions = [observation[0], observation[1], observation[2]]
+        
         ggDistance = observation[6]
         gdDistance = observation[7]
-        
+        print("======================",gdDistance)
         if ggDistance <= 0.2:
             self.kuka.grab(0,ggDistance,self.garbage.garbageData[0]["boxId"])
-            self.kuka.move2Area()
+            self.kuka.move2Area()    
+            if gdDistance <= 0.2:
+                self.kuka.release()
   
         else: 
-             # Apply action to the robotic arm
+            # Apply action to the robotic arm
             targetPosition = [action[0], action[1], action[2]]
+            p.addUserDebugLine([0,0,0], targetPosition, [1,0,0], 0.5, 3)
             self.kuka.moveArm(self.kuka.get_robot_info("id"),9999,targetPosition)
             
 
@@ -251,7 +256,7 @@ class GarbageSortingEnv(gym.Env):
         garbageDistanceGripper = euclidean_distance(effector_position, garbage_positions)
 
         # Get distance between garbage and destination
-        garbageDistanceDes = euclidean_distance([0,0,0], garbage_positions)
+        garbageDistanceDes = euclidean_distance([1.2,.8,0.8], garbage_positions)
        
         # color = 
         box_dicts = [d for d in self.garbage.garbageData if d['boxId'] is not None]
@@ -299,7 +304,7 @@ class GarbageSortingEnv(gym.Env):
         # Check if the robotic arm has successfully moved the garbage to its correct line
         success = False
         
-        if gdDistance <= 0.05:
+        if gdDistance <= 0.2:
             success = True
         
         if self.steps >= 1500:

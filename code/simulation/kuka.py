@@ -4,14 +4,25 @@ from utils import euclidean_distance
 
 class Robot():
     def __init__(self):
-        robotId = p.loadURDF("kuka_iiwa/model_vr_limits.urdf", .500000, .50000, .500000, 0.000000, 0.000000, 0.000000, 1.000000)
+        robotId = p.loadURDF("kuka_iiwa/model_vr_limits.urdf", 
+                             .6500000, 1.0000, .500000, 0.000000, 0.000000, 0.000000, 1.000000)
         jointPositions = [-0.000000, -0.000000, 0.000000, 1.570793, 0.000000, -1.036725, 0.000001]
+        # 获取机器人的当前姿势
+        pos, orn = p.getBasePositionAndOrientation(robotId)
+
+        # 计算90度旋转所需的四元数
+        rot_quat = p.getQuaternionFromEuler([0, 0, 2])
+
+        # 将机器人的朝向乘以所计算的四元数，以获得旋转后的新姿势
+        new_orn = p.multiplyTransforms([0, 0, 0], rot_quat, [0, 0, 0], orn)[1]
+
+        # 设置机器人的新姿势
+        p.resetBasePositionAndOrientation(robotId, pos, new_orn)
         posCube = p.loadURDF("cube.urdf", basePosition=[0, -0.2, 0.65], globalScaling=0.0001)
 
         p.createConstraint(robotId, 6, posCube, -1, p.JOINT_FIXED, 
                                         [0, 0, 0], [0, 0, 0.05], [0, 0, 0], 
                                         [0,0,0])
-        print("-------pos",posCube)
         for jointIndex in range(p.getNumJoints(robotId)):
             p.resetJointState(robotId, jointIndex, jointPositions[jointIndex])
             p.setJointMotorControl2(robotId, jointIndex, p.POSITION_CONTROL, jointPositions[jointIndex], 0)
@@ -40,6 +51,7 @@ class Robot():
         robot = self.robots[0]
         id= robot["id"]
 
+        print(pos)
         joint_poses = p.calculateInverseKinematics(id,
                                             6,
                                             pos,
@@ -51,10 +63,18 @@ class Robot():
                                     p.POSITION_CONTROL,
                                     joint_poses[i],                                                    
                                     )
+            
+            
+            
     def move2Area(self, index = 0, area=0):
-        pos = [1,1.8,0.8]
-        p.addUserDebugLine([0,0,0], pos, [1,0,0], 2, 1)
-        self.moveArm(self.get_robot_info("id"),9999,pos)
+        if area == 0 :
+            pos = [1.2,.8,0.8]
+            p.addUserDebugLine([0,0,0], pos, [1,0,0], 2, 1)
+            self.moveArm(self.get_robot_info("id"),9999,pos)
+        elif area == 1:
+            pos = [-.5,.6,0.8]
+            p.addUserDebugLine([0,0,0], pos, [1,0,0], 2, 1)
+            self.moveArm(self.get_robot_info("id"),9999,pos)
 
     def get_robot_info(self, type):
         robot = self.robots[0]
