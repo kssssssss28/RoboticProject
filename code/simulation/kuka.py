@@ -70,7 +70,7 @@ class Robot():
             pos = [1.2,.8,0.8]
             self.moveArm(self.get_robot_info("id"),9999,pos)
         elif area == 1:
-            pos = [-.5,.6,0.8]
+            pos = [0,.8,0.8]
             self.moveArm(self.get_robot_info("id"),9999,pos)
 
     def get_robot_info(self, type):
@@ -89,16 +89,7 @@ class Robot():
         robot = self.robots[0]
         kuka_id = self.get_robot_info("id")
         cubePos = p.getBasePositionAndOrientation(cubeId)[0]
-
-        if robot["tempConstraint"] is not None:
-            p.removeConstraint(robot["tempConstraint"])
-
         self.moveArm(0,cubeId,cubePos)
-
-        endPos = p.getBasePositionAndOrientation(3)[0]
-        
-        distance = euclidean_distance(cubePos, endPos)
-
         kuka_cid = p.createConstraint(kuka_id, 6, 
                                         cubeId, -1, p.JOINT_FIXED, 
                                         [0, 0, 0], [0, 0, 0.05], [0, 0, 0], 

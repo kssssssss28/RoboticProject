@@ -14,7 +14,7 @@ class GARBAGE():
     def __init__(self, number):
         garbageMap = ["red","blue","green"]
         self.threePath = [0.3, 0.55, 0.8]
-        self.threePathy = [-.5, -1.2, -2]
+        self.threePathy = [-.5, -1, -1.5]
         with open('../simulation/data/data.json', 'r') as fcc_file:
              garbageInfo = list(json.load(fcc_file))
 
@@ -45,7 +45,11 @@ class GARBAGE():
         garbage = self.garbageData[rd]
         path = garbage["path"]
         rdPath = random.randint(0,2)
-        rdPosition = [random.choice(self.threePath),random.choice(self.threePathy)-.1,.4]
+        x = random.choice(self.threePath)
+        y = random.choice(self.threePathy)
+        self.threePath.remove(x)
+        self.threePathy.remove(y)
+        rdPosition = [x ,y-.1, .4]
         garbage["startPos"] = rdPosition
         startPos = garbage["startPos"]
         startOri = garbage["startOri"]
@@ -89,6 +93,7 @@ class GarbageSortingEnv(gym.Env):
         self.move_right = 0.2  
         self.steps = 0
         self.total_steps = 1500
+        self.movingDone = False
 
         self.garbage = GARBAGE(self.num_garbage)
         # self.reset()
@@ -129,6 +134,8 @@ class GarbageSortingEnv(gym.Env):
         p.addUserDebugLine([0, 0, 2], [5, 0, 2], x_color, 5, 20000)
         p.addUserDebugLine([0, 0, 2], [0, 5, 2], y_color, 5, 20000)
         p.addUserDebugLine([0, 0, 0], [0, 0, 10], z_color, 5, 20000)
+        
+        
 
 
         # Not necessary to initialize any garbage here, the reset includes garbage
@@ -174,13 +181,17 @@ class GarbageSortingEnv(gym.Env):
         
         type_ = observation[8]
 
+
         if ggDistance <= 0.2:
             self.kuka.grab(0,ggDistance,self.garbage.onConveyor[0]["boxId"])
             area = type_
             self.kuka.move2Area(0,area)    
-            if gdDistance <= 0.2:
+            if gdDistance <= 0.4:
                 self.kuka.release()
-                self.garbage.onConveyor.pop()
+                p.removeBody(self.garbage.onConveyor[0]["boxId"])
+                self.movingDone = True
+                self.garbage.onConveyor.pop(0)
+                
   
         else: 
             # Apply action to the robotic arm
@@ -230,10 +241,6 @@ class GarbageSortingEnv(gym.Env):
         for i in range(3):
             self.garbage.generateGarbage()
 
-
-        box_dicts = [d for d in self.garbage.garbageData if d['boxId'] is not None]
-        type_ = box_dicts[0]['type']
-        name_ = box_dicts[0]['name']
         # print('-'*30)
         # print('Name is:', name_)
         # print('Type is: ',type_)
@@ -264,15 +271,13 @@ class GarbageSortingEnv(gym.Env):
 
         # Get end-effector position
         effector_position = p.getBasePositionAndOrientation(2)[0]
-        
-        
-        
         for i in range(len(self.garbage.onConveyor)):
-            self.garbage.onConveyor[i]["distance"] = euclidean_distance(effector_position, p.getBasePositionAndOrientation(self.garbage.onConveyor[i]["boxId"])[0]
+            self.garbage.onConveyor[i]["distance"] = euclidean_distance(effector_position, 
+                                                                        p.getBasePositionAndOrientation(self.garbage.onConveyor[i]["boxId"])[0]
                                                                         )
             
         self.garbage.onConveyor = sorted(self.garbage.onConveyor, key=lambda elem: elem['distance'], reverse=False)
-        print(self.garbage.onConveyor)
+        
         gabage = self.garbage.onConveyor
 
         garbage_positions = p.getBasePositionAndOrientation(gabage[0]["boxId"])[0]
@@ -280,16 +285,24 @@ class GarbageSortingEnv(gym.Env):
         # Get distance between garbage and gripper
         garbageDistanceGripper = euclidean_distance(effector_position, garbage_positions)
 
-        # Get distance between garbage and destination
-        garbageDistanceDes = euclidean_distance([1.2,.8,0.8], garbage_positions)
-       
+
         # color = 
-        boxType = self.garbage.garbageData[0]["type"]
+        boxType = gabage[0]["type"]
         type_ = boxType
-
-
         
         
+        # Get distance between garbage and destination
+        desRed = [1.2,.7,0.8]
+        desBlue = [0,.8,0.8]
+        
+        if boxType == 0:
+            des = desRed
+        else:
+            des = desBlue
+            
+            
+        garbageDistanceDes = euclidean_distance(des, garbage_positions)
+       
         # if debug:
         #     print('-'*30)
         #     print('closet garbage position is:')
@@ -328,13 +341,7 @@ class GarbageSortingEnv(gym.Env):
         
         # Check if garbage has fallen off the conveyor
 
-        
-        if garbage_positions[1] > .5:
-            return True
-        
-        
-        if garbage_positions[2] > 1.3:
-            return True
+    
 
         
         if len(self.garbage.onConveyor) == 0:
@@ -344,7 +351,9 @@ class GarbageSortingEnv(gym.Env):
         success = False
         
         # if gdDistance <= 0.2:
+        #     print("===success===")
         #     success = True
+        
     
         if self.steps >= 1500:
             return True
