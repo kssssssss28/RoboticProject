@@ -5,7 +5,7 @@ from utils import euclidean_distance
 class Robot():
     def __init__(self):
         robotId = p.loadURDF("kuka_iiwa/model_vr_limits.urdf", 
-                             .6700000, 1.0000, .500000, 0.000000, 0.000000, 0.000000, 1.000000)
+                             .6200000, 1.0000, .600000, 0.000000, 0.000000, 0.400000, 1.000000)
         jointPositions = [-0.000000, -0.000000, 0.000000, 1.570793, 0.000000, -1.036725, 0.000001]
         # 获取机器人的当前姿势
         pos, orn = p.getBasePositionAndOrientation(robotId)

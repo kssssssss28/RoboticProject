@@ -9,12 +9,16 @@ import pybullet_data
 import json
 from kuka import Robot
 from utils import euclidean_distance
+desRed = [1.2,.7,0.8]
+desBlue = [-1.2,.7,0.8]
+
+
 class GARBAGE():
 
     def __init__(self, number):
         garbageMap = ["red","blue","green"]
-        self.threePath = [0.3, 0.55, 0.8]
-        self.threePathy = [-.5, -1, -1.5]
+        self.threePath = [0.3, 0.55, 0.8, 0.3, 0.8]
+        self.threePathy = [0, -.5, -1, -1.5, -2]
         with open('../simulation/data/data.json', 'r') as fcc_file:
              garbageInfo = list(json.load(fcc_file))
 
@@ -93,15 +97,34 @@ class GarbageSortingEnv(gym.Env):
         self.move_right = 0.2  
         self.steps = 0
         self.total_steps = 1500
-        self.movingDone = False
+        self.grab= 0
+        self.holding = 0
 
         self.garbage = GARBAGE(self.num_garbage)
         # self.reset()
         
         # Define action and observation spaces
-        self.action_space = spaces.Box(low=.3, high=1.2, shape=(3,), dtype=np.float32)
+        self.action_space = spaces.Box(low=-2, high=2, shape=(6,), dtype=np.float32)
+        # desRed = [1.2,.7,0.8]
+        # desBlue = [-1.2,.7,0.8]
+        self.action_space.low[0] = 0
+        self.action_space.low[1] = 0
+        self.action_space.low[2] = 0
+        self.action_space.high[0] = 1
+        self.action_space.high[1] = 1
+        self.action_space.high[2] = 1
+        self.action_space.low[3] = -1.5
+        self.action_space.low[4] = -1.5
+        self.action_space.low[5] =  0.9
+        self.action_space.high[3] = 1.5
+        self.action_space.high[4] = 1.5
+        self.action_space.high[5] = 1.5
+        
+        
+        
+        
         # robot,           gripper position garbage pos gripper status distance(g and d) distance(g and g) 
-        observation_space_shape =  9
+        observation_space_shape =  3 + 3 + 1 + 1 + 1
         
         self.observation_space = spaces.Box(low=0, high=1, shape=(observation_space_shape,), dtype=np.float32)
 
@@ -126,7 +149,8 @@ class GarbageSortingEnv(gym.Env):
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.setGravity(0, 0, -9.81)
         ground_id = p.loadURDF(pybullet_data.getDataPath() + "/plane.urdf")
-
+        line = p.addUserDebugLine([0,0,0], desBlue, [0, 0, 1], 5, 300)
+        line = p.addUserDebugLine([0,0,0], desRed, [1, 0, 0], 5, 300)
         x_color = [1, 0, 0]  
         y_color = [0, 1, 0]  
         z_color = [0, 0, 1] 
@@ -160,7 +184,6 @@ class GarbageSortingEnv(gym.Env):
     def step(self, action):
 
         
-        
         # Step simulation
         p.stepSimulation()
 
@@ -172,22 +195,26 @@ class GarbageSortingEnv(gym.Env):
 
         # Get observation
         observation = self.get_observation()
-        
+        target_Position = [action[3], action[4], action[5]]
         effector_position = [observation[3], observation[4], observation[5]]
         garbage_positions = [observation[0], observation[1], observation[2]]
         
         ggDistance = observation[6]
         gdDistance = observation[7]
-        
+        targetPosition = [action[0], action[1], action[2]]
         type_ = observation[8]
-
+        line = p.addUserDebugLine(targetPosition, target_Position, [0, 1, 0], 5, 2)
 
         if ggDistance <= 0.2:
             self.kuka.grab(0,ggDistance,self.garbage.onConveyor[0]["boxId"])
             area = type_
-            self.kuka.move2Area(0,area)    
+            #self.kuka.move2Area(0,area)
+            self.holding = True
+            self.grab = self.grab + 1 
+            self.kuka.moveArm(0, 9999, target_Position)  
             if gdDistance <= 0.4:
                 self.kuka.release()
+
                 p.removeBody(self.garbage.onConveyor[0]["boxId"])
                 self.movingDone = True
                 self.garbage.onConveyor.pop(0)
@@ -195,8 +222,7 @@ class GarbageSortingEnv(gym.Env):
   
         else: 
             # Apply action to the robotic arm
-            targetPosition = [action[0], action[1], action[2]]
-            self.kuka.moveArm(self.kuka.get_robot_info("id"),9999,targetPosition)
+            self.kuka.moveArm(0,9999,targetPosition)
             
 
            
@@ -218,7 +244,7 @@ class GarbageSortingEnv(gym.Env):
         debug = False
 
         self.steps = 0
-
+        self.grab = 0
         # Reset robot arm joint positions
         joint_positions = [0, -np.pi/2, 0, -np.pi/2, 0, 0]  # UR5 example joint positions
         for i, position in enumerate(joint_positions):
@@ -238,7 +264,7 @@ class GarbageSortingEnv(gym.Env):
         # Reset and re-generate garbage objects
         self.garbage = GARBAGE(self.num_garbage)
         
-        for i in range(3):
+        for i in range(5):
             self.garbage.generateGarbage()
 
         # print('-'*30)
@@ -271,35 +297,36 @@ class GarbageSortingEnv(gym.Env):
 
         # Get end-effector position
         effector_position = p.getBasePositionAndOrientation(2)[0]
+        
+        
+        
         for i in range(len(self.garbage.onConveyor)):
+            gtype = self.garbage.onConveyor[i]["type"]
             self.garbage.onConveyor[i]["distance"] = euclidean_distance(effector_position, 
                                                                         p.getBasePositionAndOrientation(self.garbage.onConveyor[i]["boxId"])[0]
                                                                         )
             
         self.garbage.onConveyor = sorted(self.garbage.onConveyor, key=lambda elem: elem['distance'], reverse=False)
         
-        gabage = self.garbage.onConveyor
+        garbage = self.garbage.onConveyor
 
-        garbage_positions = p.getBasePositionAndOrientation(gabage[0]["boxId"])[0]
+        garbage_positions = p.getBasePositionAndOrientation(garbage[0]["boxId"])[0]
 
         # Get distance between garbage and gripper
         garbageDistanceGripper = euclidean_distance(effector_position, garbage_positions)
 
 
         # color = 
-        boxType = gabage[0]["type"]
+        boxType = garbage[0]["type"]
         type_ = boxType
         
         
         # Get distance between garbage and destination
-        desRed = [1.2,.7,0.8]
-        desBlue = [0,.8,0.8]
         
         if boxType == 0:
             des = desRed
         else:
             des = desBlue
-            
             
         garbageDistanceDes = euclidean_distance(des, garbage_positions)
        
@@ -320,7 +347,7 @@ class GarbageSortingEnv(gym.Env):
         garbageDistanceDes = np.array([garbageDistanceDes])
         type_ = np.array([type_])
 
-        # Concatenate observations
+        # Concatenate observations  3                    3                   1                  1                       1
         observation = np.concatenate((garbage_positions, effector_position, garbageDistanceGripper, garbageDistanceDes, type_))
         
         return observation
@@ -340,9 +367,21 @@ class GarbageSortingEnv(gym.Env):
         type_ = observation[8]
         
         # Check if garbage has fallen off the conveyor
-
+        for g in self.garbage.onConveyor:
+            if g["pos"][0] >= 1.5 or g["pos"][0] <= 0.2:
+                return True
+            if g["pos"][1] >= 1.1:
+                return True
     
 
+        if garbage_positions[1] >= 1.5:
+            return True
+        
+        if garbage_positions[0] >= 1.5:
+            return True
+        
+        if garbage_positions[0] <= 0.2:
+            return True
         
         if len(self.garbage.onConveyor) == 0:
             return True
@@ -350,32 +389,106 @@ class GarbageSortingEnv(gym.Env):
         # Check if the robotic arm has successfully moved the garbage to its correct line
         success = False
         
-        # if gdDistance <= 0.2:
-        #     print("===success===")
-        #     success = True
+        if gdDistance <= 0.4:
+            print("===success===")
+            success = True
         
     
-        if self.steps >= 1500:
+        if self.steps >= 500:
             return True
 
         return success
 
     def calculate_reward(self, observation):
         
-        gdDistance = observation[-1]
+        gdDistance = observation[7]
+        type_ = observation[8]
+        garbagePosition = [observation[0], observation[1], observation[2]]
+        
 
         reward = 0
+        
+        
+        grab = 0
+        
+        wrongDis = 0
+        
+        dis = 0
+        print("gdDis", gdDistance)
+        if self.holding:
+            grab = 1
+            if type_ == 1:
+                wrongDis = euclidean_distance(desRed, garbagePosition)
+            else:
+                wrongDis = euclidean_distance(desBlue, garbagePosition)
 
-        if gdDistance <= 0.1:
-            reward = reward + 0.1
-        if gdDistance <= 0.05:
-            reward = reward + 0.5
-        if gdDistance <= 0.01:
-            reward = reward + 1
-        if gdDistance >= 0.1:
-            reward = reward - 0.2
-        if gdDistance >= 0.5:
-            reward = reward - 0.5
+            
+            if gdDistance >= 2:
+                dis = -2
+                
+            
+            elif gdDistance < 2 and gdDistance >= 1.9:
+                dis = -1.9
+
+            elif gdDistance < 1.9 and gdDistance >= 1.85:
+                dis = -1.8
+            
+            elif gdDistance < 1.85 and gdDistance >= 1.8:
+                dis = -1.7
+                
+            elif gdDistance < 1.8 and gdDistance >= 1.75:
+                dis = -1.5
+                
+            elif gdDistance < 1.75 and gdDistance >= 1.7:
+                dis = -1.3
+                
+            elif gdDistance < 1.6 and gdDistance >= 1.4:
+                dis = -1.1
+            
+            elif gdDistance < 1.4 and gdDistance >= 1.3:
+                dis = -1
+                
+            elif gdDistance < 1.3 and gdDistance >= 1.2:
+                dis = -.8
+                
+            elif gdDistance < 1.2 and gdDistance >= 1.1:
+                dis = -.7
+                
+            elif gdDistance < 1.1 and gdDistance >= 1:
+                dis = -0.6    
+                               
+            elif gdDistance < 1 and gdDistance >= 0.95:
+                dis = -0.4
+            
+            elif gdDistance < .95 and gdDistance >= 0.9:
+                dis = 0
+
+            elif gdDistance < 9 and gdDistance >= 0.85:
+                dis = 0.3
+            
+            elif gdDistance < .85 and gdDistance >= 0.8:
+                dis = 0.5
+                
+            elif gdDistance < 0.8 and gdDistance >= 0.75:
+                dis = 0.7
+                
+            elif gdDistance < 0.75 and gdDistance >= 0.7:
+                dis = 0.9
+                
+            elif gdDistance < 0.6 and gdDistance >= .4:
+                dis = 1.3
+            
+            elif gdDistance < 0.4 and gdDistance >= .1:
+                dis = 1.8
+            
+            
+        reward =  grab + dis
+        
+        print("=====reward=====", wrongDis, grab, dis, reward)
+            
+        
+        
+        
         
 
         return reward
