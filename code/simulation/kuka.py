@@ -5,7 +5,7 @@ from utils import euclidean_distance
 class Robot():
     def __init__(self):
         robotId = p.loadURDF("kuka_iiwa/model_vr_limits.urdf", 
-                             .6500000, 1.0000, .500000, 0.000000, 0.000000, 0.000000, 1.000000)
+                             .6700000, 1.0000, .500000, 0.000000, 0.000000, 0.000000, 1.000000)
         jointPositions = [-0.000000, -0.000000, 0.000000, 1.570793, 0.000000, -1.036725, 0.000001]
         # 获取机器人的当前姿势
         pos, orn = p.getBasePositionAndOrientation(robotId)
@@ -50,8 +50,6 @@ class Robot():
             pos = p.getBasePositionAndOrientation(cubeId)[0]       
         robot = self.robots[0]
         id= robot["id"]
-
-        print(pos)
         joint_poses = p.calculateInverseKinematics(id,
                                             6,
                                             pos,
@@ -66,14 +64,13 @@ class Robot():
             
             
             
-    def move2Area(self, index = 0, area=0):
+    def move2Area(self, index=0, area=0):
+        self.moveArm(0,9999,[.6700000, 1.0000, 1.2])
         if area == 0 :
             pos = [1.2,.8,0.8]
-            p.addUserDebugLine([0,0,0], pos, [1,0,0], 2, 1)
             self.moveArm(self.get_robot_info("id"),9999,pos)
         elif area == 1:
             pos = [-.5,.6,0.8]
-            p.addUserDebugLine([0,0,0], pos, [1,0,0], 2, 1)
             self.moveArm(self.get_robot_info("id"),9999,pos)
 
     def get_robot_info(self, type):

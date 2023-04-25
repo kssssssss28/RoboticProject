@@ -13,8 +13,8 @@ class GARBAGE():
 
     def __init__(self, number):
         garbageMap = ["red","blue","green"]
-        self.threePath = [0.8, 0.8, 0.8]
-        #elf.threePath = [0.3, 0.55, 0.8]
+        self.threePath = [0.3, 0.55, 0.8]
+        self.threePathy = [-.5, -1.2, -2]
         with open('../simulation/data/data.json', 'r') as fcc_file:
              garbageInfo = list(json.load(fcc_file))
 
@@ -23,6 +23,7 @@ class GARBAGE():
         startOrientation = p.getQuaternionFromEuler([0, 0, 0])
         self.number = number
         count = 0
+        self.onConveyor = []
         for i in garbageInfo:  
             count = count + 4
             type = garbageMap[int(i["obj_id"])]
@@ -44,13 +45,17 @@ class GARBAGE():
         garbage = self.garbageData[rd]
         path = garbage["path"]
         rdPath = random.randint(0,2)
-        rdPosition = [self.threePath[rdPath],0,.4]
+        rdPosition = [random.choice(self.threePath),random.choice(self.threePathy)-.1,.4]
         garbage["startPos"] = rdPosition
         startPos = garbage["startPos"]
         startOri = garbage["startOri"]
         boxId = p.loadURDF(path, startPos, startOri)
         p.changeDynamics(boxId,-1,mass = 5)
-        self.garbageData[rd]["boxId"] = boxId
+        item = dict()
+        item["boxId"] = boxId
+        item["type"] = garbage["type"]
+        item["pos"] = startPos
+        self.onConveyor.append(item)
         # print('---'*10)
         # print('The type of garbage is: ', self.garbageData[rd]["type"])
         # print('---'*10)
@@ -91,7 +96,7 @@ class GarbageSortingEnv(gym.Env):
         # Define action and observation spaces
         self.action_space = spaces.Box(low=.3, high=1.2, shape=(3,), dtype=np.float32)
         # robot,           gripper position garbage pos gripper status distance(g and d) distance(g and g) 
-        observation_space_shape =  8
+        observation_space_shape =  9
         
         self.observation_space = spaces.Box(low=0, high=1, shape=(observation_space_shape,), dtype=np.float32)
 
@@ -109,7 +114,7 @@ class GarbageSortingEnv(gym.Env):
             cameraTargetPosition=self.camera_pos
         )
 
-        # Load the environment models
+        # Load the environment modelsdebug
         self.load_models()
 
     def load_models(self):
@@ -166,17 +171,20 @@ class GarbageSortingEnv(gym.Env):
         
         ggDistance = observation[6]
         gdDistance = observation[7]
-        print("======================",gdDistance)
+        
+        type_ = observation[8]
+
         if ggDistance <= 0.2:
-            self.kuka.grab(0,ggDistance,self.garbage.garbageData[0]["boxId"])
-            self.kuka.move2Area()    
+            self.kuka.grab(0,ggDistance,self.garbage.onConveyor[0]["boxId"])
+            area = type_
+            self.kuka.move2Area(0,area)    
             if gdDistance <= 0.2:
                 self.kuka.release()
+                self.garbage.onConveyor.pop()
   
         else: 
             # Apply action to the robotic arm
             targetPosition = [action[0], action[1], action[2]]
-            p.addUserDebugLine([0,0,0], targetPosition, [1,0,0], 0.5, 3)
             self.kuka.moveArm(self.kuka.get_robot_info("id"),9999,targetPosition)
             
 
@@ -210,10 +218,18 @@ class GarbageSortingEnv(gym.Env):
             if garbage["boxId"] is not None:
                 p.removeBody(garbage["boxId"])
                 garbage["boxId"] = None
+                
+        for garbage in self.garbage.onConveyor:
+            if garbage["boxId"] is not None:
+                p.removeBody(garbage["boxId"])
+                garbage["boxId"] = None
 
         # Reset and re-generate garbage objects
         self.garbage = GARBAGE(self.num_garbage)
-        self.garbage.generateGarbage()
+        
+        for i in range(3):
+            self.garbage.generateGarbage()
+
 
         box_dicts = [d for d in self.garbage.garbageData if d['boxId'] is not None]
         type_ = box_dicts[0]['type']
@@ -244,13 +260,22 @@ class GarbageSortingEnv(gym.Env):
 
     
     def get_observation(self):
-        debug = True    
+        debug = False  
 
         # Get end-effector position
         effector_position = p.getBasePositionAndOrientation(2)[0]
+        
+        
+        
+        for i in range(len(self.garbage.onConveyor)):
+            self.garbage.onConveyor[i]["distance"] = euclidean_distance(effector_position, p.getBasePositionAndOrientation(self.garbage.onConveyor[i]["boxId"])[0]
+                                                                        )
+            
+        self.garbage.onConveyor = sorted(self.garbage.onConveyor, key=lambda elem: elem['distance'], reverse=False)
+        print(self.garbage.onConveyor)
+        gabage = self.garbage.onConveyor
 
-                
-        garbage_positions = p.getBasePositionAndOrientation(self.garbage.garbageData[0]["boxId"])[0]
+        garbage_positions = p.getBasePositionAndOrientation(gabage[0]["boxId"])[0]
 
         # Get distance between garbage and gripper
         garbageDistanceGripper = euclidean_distance(effector_position, garbage_positions)
@@ -259,10 +284,9 @@ class GarbageSortingEnv(gym.Env):
         garbageDistanceDes = euclidean_distance([1.2,.8,0.8], garbage_positions)
        
         # color = 
-        box_dicts = [d for d in self.garbage.garbageData if d['boxId'] is not None]
-        type_ = box_dicts[0]['type']
-        name_ = box_dicts[0]['name']
-    
+        boxType = self.garbage.garbageData[0]["type"]
+        type_ = boxType
+
 
         
         
@@ -281,9 +305,10 @@ class GarbageSortingEnv(gym.Env):
         
         garbageDistanceGripper = np.array([garbageDistanceGripper])
         garbageDistanceDes = np.array([garbageDistanceDes])
+        type_ = np.array([type_])
 
         # Concatenate observations
-        observation = np.concatenate((garbage_positions, effector_position, garbageDistanceGripper, garbageDistanceDes))
+        observation = np.concatenate((garbage_positions, effector_position, garbageDistanceGripper, garbageDistanceDes, type_))
         
         return observation
 
@@ -295,18 +320,32 @@ class GarbageSortingEnv(gym.Env):
         p.disconnect()
 
     def is_done(self, observation):
+        
+        
         garbage_positions =[observation[0], observation[1], observation[2]]
-        gdDistance = observation[-1]
+        gdDistance = observation[7]
+        type_ = observation[8]
+        
         # Check if garbage has fallen off the conveyor
-        if garbage_positions[2] < 0.3:
+
+        
+        if garbage_positions[1] > .5:
+            return True
+        
+        
+        if garbage_positions[2] > 1.3:
+            return True
+
+        
+        if len(self.garbage.onConveyor) == 0:
             return True
         
         # Check if the robotic arm has successfully moved the garbage to its correct line
         success = False
         
-        if gdDistance <= 0.2:
-            success = True
-        
+        # if gdDistance <= 0.2:
+        #     success = True
+    
         if self.steps >= 1500:
             return True
 

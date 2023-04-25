@@ -136,7 +136,6 @@ class UR5():
                                            pos,
                                            targetOrientation=[],
                                            )
-        p.addUserDebugLine([0,0,0], pos, [1,0,0], lineWidth=40, lifeTime=200)
 
         for i in range(len(joint_poses)):
             p.setJointMotorControl2(id,
