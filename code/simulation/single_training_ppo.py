@@ -16,11 +16,11 @@ def main():
     model = PPO("MlpPolicy", env, verbose=1, tensorboard_log="./ppo_garbage_sorting_tensorboard/")
 
     # Train the agent
-    training_timesteps = 300000
+    training_timesteps = 500000
     model.learn(total_timesteps=int(training_timesteps))
 
     # Save the trained model
-    model.save(model_name)
+    model.save('ppo_conveyor_moving_KS92')
 
     # Evaluate the trained model
     mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10)

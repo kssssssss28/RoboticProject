@@ -398,98 +398,62 @@ class GarbageSortingEnv(gym.Env):
         return success
 
     def calculate_reward(self, observation):
-        
+                
         gdDistance = observation[7]
         type_ = observation[8]
         garbagePosition = [observation[0], observation[1], observation[2]]
         effector_position = [observation[3], observation[4], observation[5]]
-
+        
+        # 初始化reward为0
         reward = 0
         
-        
+        # 是否抓取垃圾
         grab = 0
         
-        wrongDis = 0
-                # 与垃圾的距离
+        # 与期望垃圾位置的欧氏距离
+        distance_to_goal = 0
+        
+        # 与垃圾的距离
         distance_to_garbage = euclidean_distance(effector_position, garbagePosition)
         
-        dis = 0
+        # 是否放置垃圾正确
+        correct_placement = 0
+        
+        # 期望垃圾位置
+        if type_ == 1:
+            goal_position = desRed
+        else:
+            goal_position = desBlue
+        
+        # 如果机械臂正在抓取垃圾
         if self.holding:
             grab = 1
+            
+            # 计算与期望垃圾位置的欧氏距离
+            distance_to_goal = euclidean_distance(goal_position, garbagePosition)
+            
+            # 如果机械臂已经将垃圾放到期望位置
+            if distance_to_goal < 0.4:
+                correct_placement = 1
+        
+        # 按照以下规则分配reward
+        # 抓取垃圾：+1
+        # 将垃圾放到期望位置：+5
+        # 与期望垃圾位置的欧氏距离越小，reward越高
+        # 与垃圾的距离越小，reward越高
+        # 将垃圾放到错误的位置，reward惩罚
+        reward = grab + correct_placement * 5 - distance_to_goal - distance_to_garbage
+        
+        # 如果将垃圾放到错误的位置，reward加上对应的惩罚
+        if not correct_placement:
             if type_ == 1:
-                wrongDis = euclidean_distance(desRed, garbagePosition)
+                wrong_goal_position = desBlue
             else:
-                wrongDis = euclidean_distance(desBlue, garbagePosition)
-
+                wrong_goal_position = desRed
+            wrong_distance = euclidean_distance(wrong_goal_position, garbagePosition)
+            reward -= wrong_distance
             
-            if gdDistance >= 2:
-                dis = -2
-                
-            
-            elif gdDistance < 2 and gdDistance >= 1.9:
-                dis = -1.9
-
-            elif gdDistance < 1.9 and gdDistance >= 1.85:
-                dis = -1.8
-            
-            elif gdDistance < 1.85 and gdDistance >= 1.8:
-                dis = -1.7
-                
-            elif gdDistance < 1.8 and gdDistance >= 1.75:
-                dis = -1.5
-                
-            elif gdDistance < 1.75 and gdDistance >= 1.7:
-                dis = -1.3
-                
-            elif gdDistance < 1.6 and gdDistance >= 1.4:
-                dis = -1.1
-            
-            elif gdDistance < 1.4 and gdDistance >= 1.3:
-                dis = -1
-                
-            elif gdDistance < 1.3 and gdDistance >= 1.2:
-                dis = -.8
-                
-            elif gdDistance < 1.2 and gdDistance >= 1.1:
-                dis = -.7
-                
-            elif gdDistance < 1.1 and gdDistance >= 1:
-                dis = -0.6    
-                               
-            elif gdDistance < 1 and gdDistance >= 0.95:
-                dis = -0.4
-            
-            elif gdDistance < .95 and gdDistance >= 0.9:
-                dis = 0
-
-            elif gdDistance < 9 and gdDistance >= 0.85:
-                dis = 0.3
-            
-            elif gdDistance < .85 and gdDistance >= 0.8:
-                dis = 0.5
-                
-            elif gdDistance < 0.8 and gdDistance >= 0.75:
-                dis = 0.7
-                
-            elif gdDistance < 0.75 and gdDistance >= 0.7:
-                dis = 0.9
-                
-            elif gdDistance < 0.6 and gdDistance >= .4:
-                dis = 1.3
-            
-            elif gdDistance < 0.4 and gdDistance >= .1:
-                dis = 1.8
-            
-            
-        reward =  grab + dis - distance_to_garbage
-    
-        
-        
-        
-        
-
         return reward
-    
 
 
 '''

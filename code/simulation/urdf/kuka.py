@@ -46,7 +46,6 @@ class Robot():
                                             pos,
                                             targetOrientation=[],
                                             )
-        p.addUserDebugLine([0, 0, 0], pos, [1, 0, 0], 5, 5)
         for i in range(len(joint_poses)):
             p.setJointMotorControl2(id,
                                     robot["availableJoint"][i]["id"],
