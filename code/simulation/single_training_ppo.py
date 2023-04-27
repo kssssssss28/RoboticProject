@@ -16,7 +16,7 @@ def main():
     model = PPO("MlpPolicy", env, verbose=1, tensorboard_log="./ppo_garbage_sorting_tensorboard/")
 
     # Train the agent
-    training_timesteps = 500000
+    training_timesteps = 10000000
     model.learn(total_timesteps=int(training_timesteps))
 
     # Save the trained model

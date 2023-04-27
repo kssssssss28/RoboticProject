@@ -4,9 +4,10 @@ from utils import euclidean_distance
 
 class Robot():
     def __init__(self):
-        robotId = p.loadURDF("kuka_iiwa/model_vr_limits.urdf", 
-                             .6200000, 1.0000, .600000, 0.000000, 0.000000, 0.400000, 1.000000)
-        jointPositions = [-0.000000, -0.000000, 0.000000, 1.570793, 0.000000, -1.036725, 0.000001]
+        # robotId = p.loadURDF("kuka_iiwa/model_vr_limits.urdf", 
+        #                      .700000, 1.0000, .5500000, 0.000000, 0.000000, 1.00000, 1.000000)
+        robotId = p.loadURDF('../urdf/ur5_robotiq_85.urdf', .600000, 1.3000, .900000, 0.000000, 0.000000, 1.70000, 1.000000)
+        self.wait = 0
         # 获取机器人的当前姿势
         pos, orn = p.getBasePositionAndOrientation(robotId)
 
@@ -18,18 +19,17 @@ class Robot():
 
         # 设置机器人的新姿势
         p.resetBasePositionAndOrientation(robotId, pos, new_orn)
-        posCube = p.loadURDF("cube.urdf", basePosition=[0, -0.2, 0.65], globalScaling=0.0001)
+        posCube = p.loadURDF("cube.urdf", basePosition=[0, -0.2, 0.65], globalScaling=0.000001)
 
-        p.createConstraint(robotId, 6, posCube, -1, p.JOINT_FIXED, 
+        p.createConstraint(robotId, 16, posCube, -1, p.JOINT_FIXED, 
                                         [0, 0, 0], [0, 0, 0.05], [0, 0, 0], 
                                         [0,0,0])
-        for jointIndex in range(p.getNumJoints(robotId)):
-            p.resetJointState(robotId, jointIndex, jointPositions[jointIndex])
-            p.setJointMotorControl2(robotId, jointIndex, p.POSITION_CONTROL, jointPositions[jointIndex], 0)
+        
         robots = list()
         robot = dict()
         robot["id"]= robotId
         robot["tempConstraint"] = None
+        
         numJoints = p.getNumJoints(robotId)
         jointInfo = [p.getJointInfo(robotId, i) for i in range(numJoints)]
         availableJoint = []
@@ -44,14 +44,16 @@ class Robot():
         robots.append(robot)
         self.robots = robots
 
-            
+    def getCurrentPos(self):
+        return p.getBasePositionAndOrientation(2)[0]
+        
     def moveArm(self, id, cubeId, pos, ori=[0,0,0]):
         if cubeId <= 999:
             pos = p.getBasePositionAndOrientation(cubeId)[0]       
         robot = self.robots[0]
         id= robot["id"]
         joint_poses = p.calculateInverseKinematics(id,
-                                            6,
+                                            17,
                                             pos,
                                             targetOrientation=[],
                                             )
@@ -85,24 +87,29 @@ class Robot():
     def getGripperStatus(self):
         return self.robots[0]["tempConstraint"]
     
-    def grab(self, index, ggDistance, cubeId):
+    def grab(self, cubeId):
         robot = self.robots[0]
         kuka_id = self.get_robot_info("id")
-        cubePos = p.getBasePositionAndOrientation(cubeId)[0]
-        self.moveArm(0,cubeId,cubePos)
-        kuka_cid = p.createConstraint(kuka_id, 6, 
+        kuka_cid = p.createConstraint(kuka_id, 15, 
                                         cubeId, -1, p.JOINT_FIXED, 
                                         [0, 0, 0], [0, 0, 0.05], [0, 0, 0], 
                                         [0,0,0])
         robot["tempConstraint"] = kuka_cid
 
 
-    def release(self):
+    def release(self, wait):
         robot = self.robots[0]
-        
         if robot["tempConstraint"] is not None:
             p.removeConstraint(robot["tempConstraint"])
             robot["tempConstraint"] = None
+
+
+        
+        
+        
+    
+    def clearWait(self):
+        self.wait = "Pause"
 
     
             
