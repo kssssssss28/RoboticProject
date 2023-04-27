@@ -19,7 +19,7 @@ class GARBAGE():
 
     def __init__(self, number):
         garbageMap = ["red","blue","green"]
-        self.threePath = [0.3, 0.8, 0.8, 0.3, 0.8, .8, .3, .8]
+        self.threePath = [0.3, 0.3, 0.55, 0.3, 0.3, .8, .3, .8]
         self.threePathy = [0, -.5, -1, -1.5, -2, -2.5, -3, -3.5] 
         with open('../simulation/data/data.json', 'r') as fcc_file:
              garbageInfo = list(json.load(fcc_file))
@@ -122,9 +122,9 @@ class GarbageSortingEnv(gym.Env):
         self.action_space.high[1] = 1
         self.action_space.high[2] = 1
         
-        self.action_space.low[3] =  -.5
-        self.action_space.low[4] =  0.5
-        self.action_space.low[5] =  .8
+        self.action_space.low[3] =  -1
+        self.action_space.low[4] =  -1
+        self.action_space.low[5] =  .3
         
         self.action_space.high[3] = 1.5
         self.action_space.high[4] = 1.5
@@ -409,6 +409,10 @@ class GarbageSortingEnv(gym.Env):
         else:
             des = desBlue
             
+        newColor = [1,0,1,1] # 红色
+        colorId = -1 # -1 表示改变所有可视化形状的颜色
+        p.changeVisualShape(garbage[0]["boxId"], colorId, rgbaColor=newColor)
+
         garbageDistanceDes = euclidean_distance(des, garbage_positions)
        
         # if debug:
@@ -481,12 +485,11 @@ class GarbageSortingEnv(gym.Env):
         return success
 
     def calculate_reward(self, observation):
-        
+        sparseReward = False
         gdDistance = observation[7]
         type_ = observation[8]
         garbagePosition = [observation[0], observation[1], observation[2]]
         effector_position = [observation[3], observation[4], observation[5]]
-
         reward = 0
         
         
@@ -496,73 +499,79 @@ class GarbageSortingEnv(gym.Env):
                 # 与垃圾的距离
         distance_to_garbage = euclidean_distance(effector_position, garbagePosition)
         
-        dis = -gdDistance
+        dis = - gdDistance
         
-        # if True:
+        if sparseReward:
             
-        #     if gdDistance >= 2:
-        #         dis = -2
-                
-            
-        #     elif gdDistance < 2 and gdDistance >= 1.9:
-        #         dis = -1.9
+            if gdDistance >= 2:
+                dis = -4
+                          
+            elif gdDistance < 2 and gdDistance >= 1.9:
+                dis = -3
 
-        #     elif gdDistance < 1.9 and gdDistance >= 1.85:
-        #         dis = -1.8
+            elif gdDistance < 1.9 and gdDistance >= 1.85:
+                dis = -5
             
-        #     elif gdDistance < 1.85 and gdDistance >= 1.8:
-        #         dis = -1.7
+            elif gdDistance < 1.85 and gdDistance >= 1.8:
+                dis = -5
                 
-        #     elif gdDistance < 1.8 and gdDistance >= 1.75:
-        #         dis = -1.5
+            elif gdDistance < 1.8 and gdDistance >= 1.75:
+                dis = -5
                 
-        #     elif gdDistance < 1.75 and gdDistance >= 1.7:
-        #         dis = -1.3
+            elif gdDistance < 1.75 and gdDistance >= 1.7:
+                dis = -4
                 
-        #     elif gdDistance < 1.6 and gdDistance >= 1.4:
-        #         dis = -1.1
+            elif gdDistance < 1.6 and gdDistance >= 1.4:
+                dis = -2
             
-        #     elif gdDistance < 1.4 and gdDistance >= 1.3:
-        #         dis = -1
+            elif gdDistance < 1.4 and gdDistance >= 1.3:
+                dis = -2
                 
-        #     elif gdDistance < 1.3 and gdDistance >= 1.2:
-        #         dis = -.8
+            elif gdDistance < 1.3 and gdDistance >= 1.2:
+                dis = -1
                 
-        #     elif gdDistance < 1.2 and gdDistance >= 1.1:
-        #         dis = -.7
+            elif gdDistance < 1.2 and gdDistance >= 1.1:
+                dis = -1
                 
-        #     elif gdDistance < 1.1 and gdDistance >= 1:
-        #         dis = -0.6    
+            elif gdDistance < 1.1 and gdDistance >= 1:
+                dis = 0 
                                
-        #     elif gdDistance < 1 and gdDistance >= 0.95:
-        #         dis = -0.4
+            elif gdDistance < 1 and gdDistance >= 0.95:
+                dis = 1
             
-        #     elif gdDistance < .95 and gdDistance >= 0.9:
-        #         dis = 0
+            elif gdDistance < .95 and gdDistance >= 0.9:
+                dis = 1.5
 
-        #     elif gdDistance < 9 and gdDistance >= 0.85:
-        #         dis = 0.3
+            elif gdDistance < 9 and gdDistance >= 0.85:
+                dis = 2
             
-        #     elif gdDistance < .85 and gdDistance >= 0.8:
-        #         dis = 0.5
+            elif gdDistance < .85 and gdDistance >= 0.8:
+                dis = 3
                 
-        #     elif gdDistance < 0.8 and gdDistance >= 0.75:
-        #         dis = 0.7
+            elif gdDistance < 0.8 and gdDistance >= 0.75:
+                dis = 4
                 
-        #     elif gdDistance < 0.75 and gdDistance >= 0.7:
-        #         dis = 0.9
+            elif gdDistance < 0.75 and gdDistance >= 0.7:
+                dis = 5.5
                 
-        #     elif gdDistance < 0.6 and gdDistance >= .4:
-        #         dis = 1.3
+            elif gdDistance < 0.6 and gdDistance >= .4:
+                dis = 6
             
-        #     elif gdDistance < 0.4 and gdDistance >= .1:
-        #         dis = 1.8
+            elif gdDistance < 0.4 and gdDistance >= .1:
+                dis = 7
+                
+        else:
+            
+            if gdDistance >= 1:
+                dis = -4
+                
+            elif gdDistance < 0.4 and gdDistance >= .1:
+                dis = 10
         
-            
-        reward =  grab + dis*2 - distance_to_garbage*1.5
+          
+        reward =  grab + dis*2.5 - distance_to_garbage*1.5
     
-        
-        
+    
         
         
 
