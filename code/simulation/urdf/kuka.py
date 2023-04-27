@@ -4,7 +4,7 @@ from utils import euclidean_distance
 
 class Robot():
     def __init__(self):
-        robotId = p.loadURDF("kuka_iiwa/model_vr_limits.urdf", 1.400000, -0.200000, 0.600000, 0.000000, 0.000000, 0.000000, 1.000000)
+        robotId = p.loadURDF("kuka_iiwa/model_vr_limits.urdf", 1.4500000, -0.200000, 0.4500000, 0.000000, 0.000000, 0.300000, 1.000000)
         table_id = p.loadURDF("table/table.urdf", basePosition=[1.0, -0.2, 0.0], baseOrientation=[0, 0, 0.7071, 0.7071])
         jointPositions = [-0.000000, -0.000000, 0.000000, 1.570793, 0.000000, -1.036725, 0.000001]
         posCube = p.loadURDF("cube.urdf", basePosition=[0, -0.2, 0.65], globalScaling=0.0001)

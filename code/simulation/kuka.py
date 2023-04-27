@@ -6,7 +6,7 @@ class Robot():
     def __init__(self):
         # robotId = p.loadURDF("kuka_iiwa/model_vr_limits.urdf", 
         #                      .700000, 1.0000, .5500000, 0.000000, 0.000000, 1.00000, 1.000000)
-        robotId = p.loadURDF('../urdf/ur5_robotiq_85.urdf', .600000, 1.3000, .900000, 0.000000, 0.000000, 1.70000, 1.000000)
+        robotId = p.loadURDF('../urdf/ur5_robotiq_85.urdf', .6300000, 1.3000, .900000, 0.000000, 0.000000, -4.0000, 1.000000)
         self.wait = 0
         # 获取机器人的当前姿势
         pos, orn = p.getBasePositionAndOrientation(robotId)

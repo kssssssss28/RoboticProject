@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot name="conveyor_belt">
   <material name="trans">
-    <color rgba="0 0 1.0 1"/>
+    <color rgba="0 0 1.0 0"/>
   </material>
   <link name="base_link">
 
@@ -12,13 +12,13 @@
     </inertial>
       <collision>
       <geometry>
-        <box size="2 150 0.1" />
+        <box size="5 150 0.1" />
       </geometry>
     </collision>
     <visual>
             <material name="trans"/>
       <geometry>
-       <box size="2 150 0.1" />
+       <box size="5 150 0.1" />
       </geometry>
     </visual>
   </link>
@@ -32,14 +32,14 @@
     <collision>
      <origin rpy="0 0 0" xyz="0 -20 0.11" />
       <geometry>
-        <box size="1 100 0.3" />
+        <box size="0.7 100 0.3" />
       </geometry>
     </collision>
     <visual>
         <origin rpy="0 0 0" xyz="0 -20 0.11" />
       <geometry>
 
-        <box size="1 100 0.3" />
+        <box size="0.7 100 0.3" />
       </geometry>
     </visual>
   </link>
