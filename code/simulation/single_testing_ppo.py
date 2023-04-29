@@ -8,9 +8,9 @@ from env import GarbageSortingEnv
 
 def main():
     # Create the environment
-    env = GarbageSortingEnv()
+    env = GarbageSortingEnv(gui=True)
     env = DummyVecEnv([lambda: env])
-    model_name = 'ppo_conveyor_moving_KSGPT'
+    model_name = 'ppo_conveyor_moving_KS1648'
     model = PPO.load(model_name)
 
     # Evaluate the trained model

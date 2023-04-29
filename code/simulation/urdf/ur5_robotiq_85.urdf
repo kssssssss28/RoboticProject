@@ -240,6 +240,8 @@
       <geometry>
         <mesh filename="../meshes/robotiq_85/collision/robotiq_arg2f_base_link.stl"/>
       </geometry>
+          <group>0</group>
+
     </collision>
   </link>
   <joint name="finger_joint" type="revolute">
@@ -269,6 +271,8 @@
       <geometry>
         <mesh filename="../meshes/robotiq_85/collision/robotiq_arg2f_85_outer_knuckle.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+          <group>0</group>
+
     </collision>
   </link>
   <joint name="left_outer_finger_joint" type="fixed">
@@ -297,6 +301,8 @@
       <geometry>
         <mesh filename="../meshes/robotiq_85/collision/robotiq_arg2f_85_outer_finger.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+          <group>0</group>
+
     </collision>
   </link>
   <joint name="left_inner_finger_joint" type="revolute">
@@ -327,6 +333,8 @@
       <geometry>
         <mesh filename="../meshes/robotiq_85/collision/robotiq_arg2f_85_inner_finger.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+          <group>0</group>
+
     </collision>
   </link>
   <joint name="left_inner_finger_pad_joint" type="fixed">
@@ -357,6 +365,8 @@
       <material name="">
         <color rgba="0.9 0.0 0.0 1"/>
       </material>
+          <group>0</group>
+
     </collision>
   </link>
   <joint name="left_inner_knuckle_joint" type="revolute">
@@ -388,6 +398,8 @@
       <geometry>
         <mesh filename="../meshes/robotiq_85/collision/robotiq_arg2f_85_inner_knuckle.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+          <group>0</group>
+
     </collision>
   </link>
   <joint name="right_outer_knuckle_joint" type="revolute">
@@ -418,6 +430,8 @@
       <geometry>
         <mesh filename="../meshes/robotiq_85/collision/robotiq_arg2f_85_outer_knuckle.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+          <group>0</group>
+
     </collision>
   </link>
   <joint name="right_outer_finger_joint" type="fixed">
@@ -446,6 +460,8 @@
       <geometry>
         <mesh filename="../meshes/robotiq_85/collision/robotiq_arg2f_85_outer_finger.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+          <group>0</group>
+
     </collision>
   </link>
   <joint name="right_inner_finger_joint" type="revolute">
@@ -476,6 +492,8 @@
       <geometry>
         <mesh filename="../meshes/robotiq_85/collision/robotiq_arg2f_85_inner_finger.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+          <group>0</group>
+
     </collision>
   </link>
   <joint name="right_inner_finger_pad_joint" type="fixed">
@@ -506,6 +524,7 @@
       <material name="LightGrey">
         <color rgba="0.7 0.7 0.7 1.0"/>
       </material>
+      
     </collision>
   </link>
   <joint name="right_inner_knuckle_joint" type="revolute">
@@ -537,6 +556,7 @@
       <geometry>
         <mesh filename="../meshes/robotiq_85/collision/robotiq_arg2f_85_inner_knuckle.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+
     </collision>
   </link>
 
