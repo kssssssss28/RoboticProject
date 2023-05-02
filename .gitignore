@@ -1,1 +1,4 @@
 .DS_store
+.pyc
+code/simulation/ppo_garbage_sorting_tensorboard/
+code/simulation/__pycache__/
