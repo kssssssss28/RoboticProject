@@ -19,7 +19,8 @@ class GARBAGE():
     def __init__(self, number):
         garbageMap = ["red","blue","green"]
         self.threePath = [0.3, 0.3, 0.55, 0.55, 0.3, .55, .3, .55]
-        self.threePathy = [.3] 
+        self.threePathy = [-1.5, -1,-.5,0,.5] 
+        self.threePathy = [.3]
         with open('../simulation/data/data.json', 'r') as fcc_file:
              garbageInfo = list(json.load(fcc_file))
 
@@ -37,7 +38,7 @@ class GARBAGE():
             boxInfo = dict()
             boxInfo["name"]= str(type) + "Box"
             boxInfo["path"]= path
-            boxInfo["type"]= self.color2int(str(type))
+            boxInfo["type"]= 0
             boxInfo["startOri"] = startOrientation
             boxInfo["startPos"] = [0, 0,  0.52]
             boxInfo["boxId"] =  count
@@ -85,7 +86,7 @@ class GARBAGE():
             return 2
 
 class GarbageSortingEnv(gym.Env):
-    def __init__(self, gui=False, num_robots=1, num_garbage=1, camera_pos=[1, .5, 0], camera_distance=4, conveyor_speed=1, garbage_delay=4000):
+    def __init__(self, gui=True, num_robots=1, num_garbage=1, camera_pos=[1, .5, 0], camera_distance=4, conveyor_speed=1, garbage_delay=4000):
         super().__init__()
 
         # Initialize environment parameters
@@ -115,16 +116,16 @@ class GarbageSortingEnv(gym.Env):
         # self.threePath = [0.3, 0.3, 0.55, 0.55, 0.3, .55, .3, .55]
         # self.threePathy = [0, -.5, -1, -1.5, -2, -2.5, -3, -3.5] 
         
-        self.action_space.low[0] = .3
+        self.action_space.low[0] = .2
         self.action_space.low[1] = 0
-        self.action_space.low[2] = 0.2
+        self.action_space.low[2] = 0.25
         
-        self.action_space.high[0] = .8
+        self.action_space.high[0] = .7
         self.action_space.high[1] = .5
         self.action_space.high[2] = 1
         
         
-        self.action_space.low[3] =  -1
+        self.action_space.low[3] =  -.5
         self.action_space.low[4] =  0
         self.action_space.low[5] =  .6
         
@@ -244,7 +245,7 @@ class GarbageSortingEnv(gym.Env):
             
         else :
             self.extraWait = self.extraWait + 1
-            if self.extraWait > 100:
+            if self.extraWait > 0:
                 self.lock = False
                 self.extraWait = 0
 
@@ -273,22 +274,19 @@ class GarbageSortingEnv(gym.Env):
                     self.holding = False    
                     self.dropIt = 0
                     self.letGO = 0          
-                    if self.lock == False:
-                        self.garbage.onConveyor.pop(0)        
+                    self.garbage.onConveyor.pop(0)        
         else :  
-            # Apply action to the robotic arm                
+            # Apply action to the robotic arm    
 
+            if self.lock == False:                
                 self.kuka.moveArm(0,9999,targetPosition)
             
-            
-            
-            
-            
+                       
             
         self.steps += 1
 
         # Calculate reward
-        reward = self.calculate_reward(observation)
+        reward = self.calculate_reward(observation, action)
 
         # Check if the episode is done
         done = self.is_done(observation) or self.steps >= self.total_steps
@@ -354,65 +352,45 @@ class GarbageSortingEnv(gym.Env):
 
     
     def get_observation(self):
-        debug = False  
+        debug = False
 
         # Get end-effector position
-        effector_position = self.kuka.getCurrentPos()    
-        
+        effector_position = self.kuka.getCurrentPos()
+
         for i in range(len(self.garbage.onConveyor)):
             gtype = self.garbage.onConveyor[i]["type"]
-            self.garbage.onConveyor[i]["distance"] = euclidean_distance(effector_position, 
-                                                                        p.getBasePositionAndOrientation(self.garbage.onConveyor[i]["boxId"])[0]
-                                                                        )
-            
-            
-        
+            self.garbage.onConveyor[i]["distance"] = np.linalg.norm(
+                np.array(effector_position) - np.array(p.getBasePositionAndOrientation(self.garbage.onConveyor[i]["boxId"])[0])
+            )
+
         self.garbage.onConveyor = sorted(self.garbage.onConveyor, key=lambda elem: elem['distance'], reverse=False)
 
-        
-        
         garbage = self.garbage.onConveyor
         garbage_positions = p.getBasePositionAndOrientation(garbage[0]["boxId"])[0]
         garbage[0]["holding"] = False
 
         # Get distance between garbage and gripper
-        garbageDistanceGripper = euclidean_distance(effector_position, garbage_positions)
+        garbageDistanceGripper = np.linalg.norm(np.array(effector_position) - np.array(garbage_positions))
 
-
-        # color = 
+        # color =
         boxType = garbage[0]["type"]
         type_ = boxType
-        
-        
+
         # Get distance between garbage and destination
-        
         if boxType == 0:
             des = desRed
         else:
             des = desBlue
-            
-        garbageDistanceDes = euclidean_distance(des, garbage_positions)
-       
-        # if debug:
-        #     print('-'*30)
-        #     print('closet garbage position is:')
-        #     print(garbage_positions)
-        #     print('ee position is:')
-        #     print(effector_position)
-        #     print('gg distance is:')
-        #     print(garbageDistanceGripper)
-        #     print('gd distance is:')
-        #     print(garbageDistanceDes)
 
-        #     print('-'*30)
-        
+        garbageDistanceDes = np.linalg.norm(np.array(des) - np.array(garbage_positions))
+
         garbageDistanceGripper = np.array([garbageDistanceGripper])
         garbageDistanceDes = np.array([garbageDistanceDes])
         type_ = np.array([type_])
 
         # Concatenate observations  3                    3                   1                  1                       1
         observation = np.concatenate((garbage_positions, effector_position, garbageDistanceGripper, garbageDistanceDes, type_))
-        
+
         return observation
 
 
@@ -455,94 +433,61 @@ class GarbageSortingEnv(gym.Env):
         
         # if gdDistance <= 0.1:
         #     success = True
-    
-        if self.steps >= 70:
+
+        if self.steps >= 500:
             
             return True
 
         return success
 
-    def calculate_reward(self, observation):
-        sparseReward = True
-        gdDistance = observation[7]
-        type_ = observation[8]
-        garbagePosition = [observation[0], observation[1], observation[2]]
-        effector_position = [observation[3], observation[4], observation[5]]
-        reward = 0
+    def calculate_reward(self, observation, action):
+        # sparseReward = True
+        # gdDistance = observation[7]
+        # type_ = observation[8]
+        # garbagePosition = [observation[0], observation[1], observation[2]]
+        # effector_position = [observation[3], observation[4], observation[5]]
+        # reward = 0
+        #         # 与垃圾的距离
+        # distance_to_garbage = euclidean_distance(effector_position, garbagePosition)
+    
         
-        wrongDis = 0
-                # 与垃圾的距离
-        distance_to_garbage = euclidean_distance(effector_position, garbagePosition)
-        
-        dis = - gdDistance
-        
-        if sparseReward == False:
-            
-            if gdDistance >= 2:
-                dis = -15
-                
-            elif gdDistance < 1.8 and gdDistance >= 1.75:
-                dis = -15
-                
-            elif gdDistance < 1.75 and gdDistance >= 1.7:
-                dis = -15
-                
-            elif gdDistance < 1.6 and gdDistance >= 1.4:
-                dis = -15
-            
-            elif gdDistance < 1.4 and gdDistance >= 1.3:
-                dis = -15
-                
-            elif gdDistance < 1.3 and gdDistance >= 1.2:
-                dis = -10
-                
-            elif gdDistance < 1.2 and gdDistance >= 1.1:
-                dis = -7
-                
-            elif gdDistance < 1.1 and gdDistance >= 1:
-                dis = -2
-                               
-            elif gdDistance < 1 and gdDistance >= 0.95:
-                dis = 1
-            
-            elif gdDistance < .95 and gdDistance >= 0.9:
-                dis = 3
-
-            elif gdDistance < 9 and gdDistance >= 0.85:
-                dis = 4
-            
-            elif gdDistance < .85 and gdDistance >= 0.8:
-                dis = 5
-                
-            elif gdDistance < 0.8 and gdDistance >= 0.75:
-                dis = 6
-                
-            elif gdDistance < 0.75 and gdDistance >= 0.7:
-                dis = 8
-                
-            elif gdDistance < 0.6 and gdDistance >= .4:
-                dis = 10
-            
-            elif gdDistance < 0.4 and gdDistance >= .3:
-                dis = 12
-            
-            elif gdDistance < 0.3 and gdDistance >= .2:
-                dis = 14
-            
-            elif gdDistance < 0.2 and gdDistance >= .1:
-                dis = 18
-        
-        reward =   dis  - distance_to_garbage * 50
-        
-        if sparseReward == True:
-            reward =   -(gdDistance * 1.5  + distance_to_garbage * 10)
+        # reward =  -  ( gdDistance + distance_to_garbage )
         
     
         
-        #print("========current type:", type_,"=====dis to des:", gdDistance, "=====gripper dis:", distance_to_garbage,"===total:", reward)
+        # print("========current type:", type_,"=====dis to des:", gdDistance, "=====gripper dis:", distance_to_garbage,"===total:", reward)
         
+        reward = 0
+
+        # 解析观测空间和动作空间的值
+        trash_position = observation[:3]
+        arm_end_position = observation[3:6]
+        distance_to_trash = observation[6]
+        distance_to_target = observation[7]
+        trash_type = observation[8]
+        arm_move_to_pick, arm_move_to_drop = np.split(action, 2)
+
+        # 根据垃圾种类确定目标位置
+        target_positions = np.array([[1.4, 0.7, 1.1], [-0.2, 0.7, 1.1]])
+        correct_drop_position = target_positions[int(trash_type)]
+
+        # 奖励：减少末端与垃圾的距离
+        reward -= distance_to_trash
+
+        # 奖励：减少垃圾到正确目标位置的距离
+        reward -= distance_to_target
+
+        # 惩罚：如果机械手臂末端与垃圾的距离小于一定阈值，但没有拿起垃圾，则给予惩罚
+        if distance_to_trash < 0.1 and not np.allclose(arm_end_position, arm_move_to_pick, atol=0.1):
+            reward -= 1
+
+        # 惩罚：如果机械手臂没有将垃圾放置在正确的位置，则给予惩罚
+        if not np.allclose(correct_drop_position, arm_move_to_drop, atol=0.1):
+            reward -= 1
 
         return reward
+
+ 
     
 
 

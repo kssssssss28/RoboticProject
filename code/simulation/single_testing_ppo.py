@@ -4,13 +4,14 @@ import numpy as np
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.evaluation import evaluate_policy
-from env import GarbageSortingEnv
-
+from envNotSparse import GarbageSortingEnv
+#from envSparse import GarbageSortingEnv
+#from envOnlyDes import GarbageSortingEnv
 def main():
     # Create the environment
     env = GarbageSortingEnv(gui=True)
     env = DummyVecEnv([lambda: env])
-    model_name = 'ppo_conveyor_moving_KS1648'
+    model_name = 'best'
     model = PPO.load(model_name)
 
     # Evaluate the trained model

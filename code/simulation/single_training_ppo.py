@@ -4,13 +4,15 @@ import numpy as np
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.evaluation import evaluate_policy
-from env import GarbageSortingEnv
+#from envNotSparse import GarbageSortingEnv
+#from envSparse import GarbageSortingEnv
+from envOnlyDes import GarbageSortingEnv
 
 def main():
     # Create the environment
     env = GarbageSortingEnv(gui=False)
     env = DummyVecEnv([lambda: env])
-    model_name = 'ppo_conveyor_moving_KS1545'
+    model_name = 'ppo_conveyor_moving_KS-Sparse-onlySeekDistance'
     
     # Instantiate the PPO agent
     model = PPO("MlpPolicy", env, verbose=1, tensorboard_log="./ppo_garbage_sorting_tensorboard/")
