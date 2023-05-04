@@ -172,25 +172,25 @@ class GarbageSortingEnv(gym.Env):
         
         
 
-        # 绘制红色正方形
         redSquarePoints = [    
             [desRed[0] - 0.25, desRed[1] - 0.25, desRed[2]],
-            [desRed[0] - 0.25, desRed[1] + 0.25, desRed[2]],
-            [desRed[0] + 0.25, desRed[1] + 0.25, desRed[2]],
-            [desRed[0] + 0.25, desRed[1] - 0.25, desRed[2]]
+            [desRed[0] - 0.25, desRed[1] + 1, desRed[2]],
+            [desRed[0] + .5, desRed[1] + 1, desRed[2]],
+            [desRed[0] + .5, desRed[1] - 0.25, desRed[2]]
         ]
+
+        blueSquarePoints = [    
+            [desBlue[0] - 0.25, desBlue[1] - 0.25, desBlue[2]],
+            [desBlue[0] - 0.25, desBlue[1] + 1, desBlue[2]],
+            [desBlue[0] + 0.5, desBlue[1] + 1, desBlue[2]],
+            [desBlue[0] + 0.5, desBlue[1] - 0.25, desBlue[2]]
+        ]
+
         redSquare = p.addUserDebugLine(redSquarePoints[0], redSquarePoints[1], [1, 0, 0], 3, 300)
         redSquare = p.addUserDebugLine(redSquarePoints[1], redSquarePoints[2], [1, 0, 0], 3, 300)
         redSquare = p.addUserDebugLine(redSquarePoints[2], redSquarePoints[3], [1, 0, 0], 3, 300)
         redSquare = p.addUserDebugLine(redSquarePoints[3], redSquarePoints[0], [1, 0, 0], 3, 300)
 
-        # 绘制蓝色正方形
-        blueSquarePoints = [    
-            [desBlue[0] - 0.25, desBlue[1] - 0.25, desBlue[2]],
-            [desBlue[0] - 0.25, desBlue[1] + 0.25, desBlue[2]],
-            [desBlue[0] + 0.25, desBlue[1] + 0.25, desBlue[2]],
-            [desBlue[0] + 0.25, desBlue[1] - 0.25, desBlue[2]]
-        ]
         blueSquare = p.addUserDebugLine(blueSquarePoints[0], blueSquarePoints[1], [0, 0, 1], 3, 300)
         blueSquare = p.addUserDebugLine(blueSquarePoints[1], blueSquarePoints[2], [0, 0, 1], 3, 300)
         blueSquare = p.addUserDebugLine(blueSquarePoints[2], blueSquarePoints[3], [0, 0, 1], 3, 300)
@@ -248,7 +248,7 @@ class GarbageSortingEnv(gym.Env):
             
         else :
             self.extraWait = self.extraWait + 1
-            if self.extraWait > 200:
+            if self.extraWait > 100:
                 self.lock = False
                 self.extraWait = 0
 
@@ -272,10 +272,10 @@ class GarbageSortingEnv(gym.Env):
         if self.holding == True: 
             self.falling = True
             self.letGO = self.letGO + 1
-            if gdDistance <= 0.3 and self.letGO == 200:
+            if gdDistance <= 0.4 and self.letGO == 100:
                 self.dropIt = self.dropIt + 1
                 self.wait = self.wait + 1
-                if self.dropIt == 30 or self.letGO == 200: 
+                if self.dropIt == 30 or self.letGO == 100: 
                     self.kuka.release(self.wait)  
                     self.holding = False    
                     self.dropIt = 0

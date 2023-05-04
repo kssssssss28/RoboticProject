@@ -11,7 +11,7 @@ def main():
     # Create the environment
     env = GarbageSortingEnv(gui=True)
     env = DummyVecEnv([lambda: env])
-    model_name = 'best'
+    model_name = '../model/ppo_armPickUpBox'
     model = PPO.load(model_name)
 
     # Evaluate the trained model
