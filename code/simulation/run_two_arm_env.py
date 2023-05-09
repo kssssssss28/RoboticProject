@@ -1,6 +1,6 @@
 
 import time
-from env_only_red_v2 import GarbageSortingEnvOnlyRedV2
+from two_arms_env import GarbageSortingEnvOnlyRedV2
 import os
 import time
 import pybullet as p
@@ -48,8 +48,11 @@ def generate_move_right_pattern(array, steps):
     
     return pattern
 
-start_array = np.array([-0.15898392, -1.0, -0.09076598, 0.63219655, 0.37908894, -0.88832015], dtype=np.float32)
-num_arrays = 5000
+start_array1 = np.array([-0.15898392, -1.0, -0.09076598, 0.63219655, 0.37908894, -0.88832015], dtype=np.float32)
+start_array2 = np.array([-0.6935777  , 1.0789974 , -0.03136498 ,-0.02120538, 0.37908894, -0.88832015], dtype=np.float32)
+stay_array = np.array([[ -5.118709 ,  -16.130434  ,   0.46031085 , -5.430055  ,  -5.13172, 1.8671491 ]], dtype=np.float32)
+num_arrays = 500
+
 def main():
 
     debug = False
@@ -61,10 +64,19 @@ def main():
     # with open('push.pkl', 'rb') as f:
     #     loaded_list = pickle.load(f)
     # loaded_list = loaded_list[::-1]
-    move_left = generate_move_left_pattern(start_array, num_arrays)
-    print(move_left[-1])
+
+    move_left1 = generate_move_left_pattern(start_array1, num_arrays)
+    move_left2 = generate_move_left_pattern(start_array2, num_arrays)
+
     # move_right = generate_move_right_pattern(np.array(move_left[-1], dtype=np.float32), num_arrays)
-    move_right = generate_move_right_pattern(start_array, num_arrays)
+    move_right1 = generate_move_right_pattern(start_array1, num_arrays)
+    move_right2 = generate_move_right_pattern(start_array2, num_arrays)
+
+    print('Last element of move right2 is: ', move_right2[-1])
+    reversed_right1 = generate_move_left_pattern(np.array(move_right1[-1], dtype=np.float32), num_arrays)
+    reversed_right2 = generate_move_left_pattern(np.array(move_right2[-1], dtype=np.float32), num_arrays)
+    reversed_left1 =  generate_move_right_pattern(np.array(move_left1[-1], dtype=np.float32), num_arrays)
+    reversed_left2 =  generate_move_right_pattern(np.array(move_left2[-1], dtype=np.float32), num_arrays)
     
     for episode in range(total_episodes):
         print(f"Episode: {episode + 1}")
@@ -73,17 +85,28 @@ def main():
         episode_reward = 0
 
         for step in range(max_steps_per_episode):
-            
+            print('step is: ', step)
             # action = env.action_space.sample()  \
             # if step < 300:
             #     action = move_left[step]
             # else:
             #     step = step-300
             #     action = move_right[step]
-            action = move_right[step]
-            print('step is: ', step)
-            print('action is: ', action)
-            obs, reward, done, _ = env.step(action)
+            if step < 500 or step >= 1000:
+                if step >= 1000:
+                    action1 = move_left1[step-1000]
+                    action2 = move_right2[step-1000]
+                else:
+                    action1 = move_left1[step]
+                    action2 = move_right2[step]
+            else:
+
+                action1 = reversed_left1[step-500]
+                action2 = reversed_right2[step-500]
+            
+            # print('action1 is: ', action1)
+            # print('action2 is: ', action2)
+            obs, reward, done, _ = env.step(action1, action2)
 
             if debug: 
                 print("Observation:", obs)

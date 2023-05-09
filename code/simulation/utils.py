@@ -1,7 +1,7 @@
 import pybullet as p
 import time
 import pybullet_data
-from robot import GARBAGE
+
 import pybullet as p
 import numpy as np
 from PIL import Image
@@ -36,31 +36,31 @@ def initWorld(GUI, cameraPos = [1, .5, 0], dis = 4):
         cameraTargetPosition=cameraPos
     )
 
-def starSimulation(totalGarbage, takeImg, delay = 4000):
+# def starSimulation(totalGarbage, takeImg, delay = 4000):
 
-    box = GARBAGE(20)
-    count = 3500
-    total = 0
-    while (True): 
+#     box = GARBAGE(20)
+#     count = 3500
+#     total = 0
+#     while (True): 
 
-        rd = random.randint(0, 50)
-
-
-        if count >= delay: 
-            count = 0
-            total = total + 1
-            if total < totalGarbage + 1:
-                box.generateGarbage()
-                if takeImg:
-                    saveImg()
+#         rd = random.randint(0, 50)
 
 
-        if count >= delay + 200:
-            if takeImg:
-                saveImg()
+#         if count >= delay: 
+#             count = 0
+#             total = total + 1
+#             if total < totalGarbage + 1:
+#                 box.generateGarbage()
+#                 if takeImg:
+#                     saveImg()
+
+
+#         if count >= delay + 200:
+#             if takeImg:
+#                 saveImg()
 
 
 
-        p.stepSimulation() 
-        count = count + rd
-        time.sleep(1./240.) 
+#         p.stepSimulation() 
+#         count = count + rd
+#         time.sleep(1./240.) 
