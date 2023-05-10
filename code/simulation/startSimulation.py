@@ -1,8 +1,11 @@
 import tkinter as tk
 import subprocess
-from utils import getGabageInfo
+from Sensing_cv.predict import run
+NUM = 30
 
-getGabageInfo()
+
+
+run(NUM)
 
 root = tk.Tk()
 

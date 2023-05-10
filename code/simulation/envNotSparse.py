@@ -443,8 +443,6 @@ class GarbageSortingEnv(gym.Env):
 
     def is_done(self, observation):
         
-        
-        
         if len(self.garbage.onConveyor) == 0:
              return True
         
@@ -465,7 +463,6 @@ class GarbageSortingEnv(gym.Env):
         garbagePosition = [observation[0], observation[1], observation[2]]
         effector_position = [observation[3], observation[4], observation[5]]
         reward = 0
-                # 与垃圾的距离
         distance_to_garbage = euclidean_distance(effector_position, garbagePosition)
         
         dis =  0
@@ -533,6 +530,7 @@ class GarbageSortingEnv(gym.Env):
         else:
             self.punish = 0
             
+            
         if self.grab == 0:
             grab = 50
         else:
@@ -540,11 +538,6 @@ class GarbageSortingEnv(gym.Env):
         
             
         reward =   dis  - distance_to_garbage * 100 - self.punish - grab
-        
-        
-    
-        
-        #print("========grab:", self.grab,"=====dis to des:", dis, "=====gripper dis:", distance_to_garbage * 100,"===total:", reward)
         
 
         return reward

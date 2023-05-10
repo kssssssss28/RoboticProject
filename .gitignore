@@ -1,4 +1,5 @@
 .DS_store
 .pyc
 code/simulation/ppo_garbage_sorting_tensorboard/
-code/simulation/__pycache__/
+code/simulation/Sensing_cv/cropped_result
+code/simulation/__pycache__

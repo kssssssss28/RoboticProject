@@ -7,6 +7,7 @@ import numpy as np
 from PIL import Image
 import random
 import math
+
 def saveImg():
     img_arr = p.getCameraImage(width=480, height=320)
     rgb_arr = np.array(img_arr[2])[:,:,[2,1,0]] # BGR to RGB
@@ -78,6 +79,3 @@ def euclidean_distance(x, y):
 
     return math.sqrt(distance_sq)
 
-def getGabageInfo():
-    print("----garbage infomation collected----")
-  
