@@ -69,18 +69,15 @@ def starSimulation(totalGarbage, takeImg, delay = 4000):
 
 
 def euclidean_distance(x, y):
-    """
-    计算两个n维向量之间的欧式距离
-    :param x: 一个包含n个元素的列表或元组，表示向量1
-    :param y: 一个包含n个元素的列表或元组，表示向量2
-    :return: 一个浮点数，表示向量1和向量2之间的欧式距离
-    """
-    # 判断向量维度是否相同
     if len(x) != len(y):
-        raise ValueError("向量维度不同，无法计算欧式距离")
+        raise ValueError()
     
-    # 计算向量差的平方和
+
     distance_sq = sum([(xi - yi) ** 2 for xi, yi in zip(x, y)])
     
-    # 取平方根并返回结果
+
     return math.sqrt(distance_sq)
+
+def getGabageInfo():
+    print("----garbage infomation collected----")
+  
