@@ -46,7 +46,7 @@ def predict(path):
     model = resnet50(num_classes=8).to(device)  
 
     # load model weights
-    weights_path = "Sensing_cv/resNet50.pth"
+    weights_path = "./resNet50_pre.pth"
     model.load_state_dict(torch.load(weights_path, map_location=device)) 
 
     # prediction

@@ -11,25 +11,22 @@ from models import resnet50
 from collections import OrderedDict
 from torch.utils.tensorboard import SummaryWriter
 
-def main(opt):
-    device = torch.device("cuda:"+str(opt.device) if torch.cuda.is_available() else "cpu")
+def main():
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("using {} device.".format(device))
 
-    # data_transform = {
-    #     "train": transforms.Compose([transforms.RandomResizedCrop(256),
-    #                                  transforms.RandomHorizontalFlip(),
-    #                                  transforms.ToTensor(),
-    #                                  transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),  
-    #     "val": transforms.Compose([transforms.Resize(256),  
-    #                                transforms.CenterCrop(224),  
-    #                                transforms.ToTensor(),
-    #                                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])}
-    data_transform = transforms.Compose([transforms.RandomResizedCrop(256),
+    data_transform = {
+        "train": transforms.Compose([transforms.RandomResizedCrop(256),
                                      transforms.RandomHorizontalFlip(),
                                      transforms.ToTensor(),
-                                     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
-    data_root = '../cropped_result/'  # get data root path
-    dataset = mydataset.ImageClassifyDataset(data_root, transform=data_transform)
+                                     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),  
+        "val": transforms.Compose([transforms.Resize(256),  
+                                   transforms.CenterCrop(224),  
+                                   transforms.ToTensor(),
+                                   transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])}
+
+    data_root = './cropped_result/'  # get data root path
+    dataset = mydataset.ImageClassifyDataset(data_root, transform=data_transform["train"])
     total_len = len(dataset)
     train_len = int(0.7 * total_len)
     val_len = total_len - train_len
@@ -81,7 +78,7 @@ def main(opt):
     params = [p for p in net.parameters() if p.requires_grad]
     optimizer = optim.SGD(params, lr=0.01)
 
-    epochs = opt.epoch
+    epochs = 200
     best_acc = 0.0
     save_path = './resNet50_pre.pth'
     train_steps = len(train_loader)
@@ -133,14 +130,6 @@ def main(opt):
     print('Finished Training')
 
 
-
-def parse_opt():
-    parser = argparse.ArgumentParser()
-    
-    parser.add_argument('--device', default=1, help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
-    parser.add_argument('--epoch', type=int, default=100, help='epochs to train')
-    opt = parser.parse_args()
-    return opt
 if __name__ == '__main__':
-    opt = parse_opt()
-    main(opt)
+    main()
+

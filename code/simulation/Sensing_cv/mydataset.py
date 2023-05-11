@@ -6,20 +6,24 @@ import cv2
 import random
 import numpy as np
 from PIL import Image
-cls_dict ={'Shoe': 0,
- 'Paper': 1,
- 'Styrofoampiece': 2,
- 'Cook': 3,
- 'Bottle': 4,
- 'Metal': 5,
- 'Blisterpack': 6,
- 'Plastic': 7}
+
+cls_dict = {
+    'Blisterpack': 0,
+    'Bottle': 1,
+    'Cook': 2,
+    'Metal': 3,
+    'Paper': 4,
+    'Plastic': 5,
+    'Shoe': 6,
+    'Styrofoampiece': 7}
+
 class ImageClassifyDataset(Dataset):
-    def __init__(self, imagedir, classify_num=8, train=True, transform=None):
+    def __init__(self, imagedir, classify_num=8, train=True, mode='train', transform=None):
 
         self.imagedir = imagedir
         self.classify_num = classify_num
         self.transform = transform
+        self.mode = mode
         self.img_list = []
         img_files = os.listdir(imagedir)
         for img in img_files:
@@ -27,7 +31,9 @@ class ImageClassifyDataset(Dataset):
             label = cls_dict[cls]
             p = os.path.join(imagedir, img)
             self.img_list.append([p, label])
-
+        img_len = len(self.img_list)
+        if mode == 'val':
+            self.img_list = random.sample(self.img_list, int(0.3*img_len))
 
     def __len__(self):
         return len(self.img_list)
