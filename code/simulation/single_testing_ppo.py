@@ -13,7 +13,6 @@ def main():
     env = DummyVecEnv([lambda: env])
     model_name = '../model/ppo_armPickUpBox'
     model = PPO.load(model_name)
-
     # Evaluate the trained model
     mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10)
 

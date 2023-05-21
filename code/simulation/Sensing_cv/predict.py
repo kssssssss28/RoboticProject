@@ -46,7 +46,7 @@ def predict(path):
     model = resnet50(num_classes=8).to(device)  
 
     # load model weights
-    weights_path = "./resNet50_pre.pth"
+    weights_path = "Sensing_cv/resNet50_pre.pth"
     model.load_state_dict(torch.load(weights_path, map_location=device)) 
 
     # prediction
@@ -124,9 +124,10 @@ def run(num):
     path = os.getcwd().replace("/Sensing_cv","")
     path = path + "/data/data.json"
 
+
+    
     with open(path, "w") as f:
         f.write(stored_json)
-    
     
     print("======data preparation done======")
     

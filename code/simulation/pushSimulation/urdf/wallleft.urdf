@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<robot name="my_robot">
+
+  <link name="wall">
+    <inertial>
+      <mass value="1000" />
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001" />
+    </inertial>
+    <collision>
+      <geometry>
+        <box size="1 200 1" />
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0.5 0 0" />
+      <geometry>
+        <box size="1 200 1" />
+      </geometry>
+    </visual>
+
+    <parent link="ground" />
+  </link>
+
+  <link name="ground">
+    <collision>
+      <geometry>
+        <plane normal="0 0 1" />
+      </geometry>
+    </collision>
+    <visual>
+      <geometry>
+        <plane normal="0 0 1" />
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="fixed_joint" type="fixed">
+    <parent link="ground" />
+    <child link="wall" />
+    <origin rpy="0 0 0" xyz="0 0 0" />
+  </joint>
+
+</robot>

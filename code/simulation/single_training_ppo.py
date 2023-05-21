@@ -6,7 +6,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.evaluation import evaluate_policy
 #from envNotSparse import GarbageSortingEnv
 #from envSparse import GarbageSortingEnv
-from envOnlyDes import GarbageSortingEnv
+from envNotSparse import GarbageSortingEnv
 
 def main():
     # Create the environment

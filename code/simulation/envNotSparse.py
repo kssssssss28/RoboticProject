@@ -20,9 +20,8 @@ class GARBAGE():
         garbageMap = ["red","blue","green"]
         self.number = number
         self.threePath = self.getXArry()
-        self.threePathy = [0.3 - 1.2 * i for i in range(number)]
+        self.threePathy = [0.3 - .8 * i for i in range(number)]
         self.greenGarbage = []
-        print("===", self.threePath, self.threePathy)
         with open('../simulation/data/data.json', 'r') as fcc_file:
              garbageInfo = list(json.load(fcc_file))
         garbageInfo.pop(0)
@@ -48,7 +47,7 @@ class GARBAGE():
         self.garbageData = list(self.garbageData)
 
     def generateGarbage(self):
-        rd = random.randint(0, self.number)
+        rd = random.randint(0, len(self.garbageData) - 1)
         garbage = self.garbageData[rd]
         path = garbage["path"]
         x = random.choice(self.threePath)
@@ -69,6 +68,8 @@ class GARBAGE():
         item["boxId"] = boxId
         item["type"] = garbage["type"]
         item["pos"] = startPos
+        item["g"] = "0"
+        item["d"] = "0"
         item["holding"] = False
         if item["type"] != 2:
             self.onConveyor.append(item)
@@ -102,7 +103,7 @@ class GARBAGE():
 
 
 class GarbageSortingEnv(gym.Env):
-    def __init__(self, gui=False, num_robots=1, num_garbage=15, camera_pos=[1, .5, 0], camera_distance=4, conveyor_speed=1, garbage_delay=4000):
+    def __init__(self, gui=True, num_robots=1, num_garbage=15, camera_pos=[1, .5, 0], camera_distance=4, conveyor_speed=1, garbage_delay=4000):
         super().__init__()
 
         # Initialize environment parameters
@@ -181,7 +182,8 @@ class GarbageSortingEnv(gym.Env):
         ground_id = p.loadURDF(pybullet_data.getDataPath() + "/plane.urdf")
 
 
-        
+        self.total_g = 0
+        self.total_d = 0
         
 
         redSquarePoints = [    
@@ -223,7 +225,7 @@ class GarbageSortingEnv(gym.Env):
         # ------------------------- initialize conveyor belt ------------------------------
         conveyor_pos = [0.56, 0, 0.1]
         conveyor_ori = p.getQuaternionFromEuler([0, 0, 0])
-        self.conveyor_id = p.loadURDF("../simulation/urdf/block.urdf", conveyor_pos, conveyor_ori)
+        self.conveyor_id = p.loadURDF("../simulation/urdf/blockForGrab.urdf", conveyor_pos, conveyor_ori)
         conveyor_speed = self.conveyor_speed   
         conveyor_joint_index = 0 
         p.setJointMotorControl2(self.conveyor_id, conveyor_joint_index, p.VELOCITY_CONTROL, targetVelocity=conveyor_speed)
@@ -249,8 +251,6 @@ class GarbageSortingEnv(gym.Env):
         garbage_positions = [observation[0], observation[1], observation[2]]
         maxHightList = []
         tpye_ = [observation[7]]
-        
-        
         maxH = -1
         for garbage in self.garbage.onConveyor:
             id = garbage["boxId"]
@@ -274,6 +274,7 @@ class GarbageSortingEnv(gym.Env):
         desPosition = [action[3], action[4], action[5]]
         if ggDistance <= 0.2 and self.holding == False:
             self.holding = True
+            self.garbage.onConveyor[0]["g"] = "1"
             self.kuka.grab(self.garbage.onConveyor[0]["boxId"])
             self.grab = self.grab + 1 
             self.kuka.moveArm(0, 9999, desPosition) 
@@ -289,7 +290,9 @@ class GarbageSortingEnv(gym.Env):
                     self.holding = False    
                     self.dropIt = 0
                     self.letGO = 0          
-                    self.garbage.onConveyor.pop(0)        
+                    self.garbage.onConveyor.pop(0) 
+                    if gdDistance < 0.4: 
+                        self.garbage.onConveyor[0]["d"] = "1"       
         else :  
             # Apply action to the robotic arm    
 
@@ -313,6 +316,7 @@ class GarbageSortingEnv(gym.Env):
 
     def reset(self):
         # print('Reset!!!!!!')
+
         debug = False
         self.holding = False
         self.steps = 0
@@ -451,10 +455,13 @@ class GarbageSortingEnv(gym.Env):
         
         # if gdDistance <= 0.1:
         #     success = True
-        if self.steps >= 10000:
-            
-            return True
-
+        if self.steps >= 1000:
+            for g in self.garbage.onConveyor:
+                if g["g"] == "1":
+                    self.total_g = self.total_g + 1
+                if g["d"] == "1":
+                    self.total_d = self.total_d + 1
+            return True        
         return success
 
     def calculate_reward(self, observation):
@@ -510,12 +517,14 @@ class GarbageSortingEnv(gym.Env):
                 
             elif gdDistance < 0.75 and gdDistance >= 0.7:
                 dis = 50
+
                 
             elif gdDistance < 0.6 and gdDistance >= .4:
                 dis = 80
             
             elif gdDistance < 0.4 and gdDistance >= .3:
                 dis = 100
+                
             
             elif gdDistance < 0.3 and gdDistance >= .2:
                 dis = 100
